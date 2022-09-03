@@ -11,6 +11,7 @@
 
 <script setup>
 const colorMode = useColorMode()
+const themes = useThemes()
 </script>
 
 <style lang="scss" scoped></style>
