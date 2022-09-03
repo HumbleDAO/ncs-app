@@ -1,5 +1,5 @@
 {
-    "name": "ncs-protocol",
+    "name": "ncs-app",
     "description": "No-cost Protocol",
     "private": true,
     "scripts": {
