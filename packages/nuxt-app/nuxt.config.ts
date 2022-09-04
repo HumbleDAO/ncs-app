@@ -20,8 +20,6 @@ export default defineNuxtConfig({
         ],
     ],
 
-    srcDir: 'nuxt-app/',
-
     vite: {
         plugins: [eslintPlugin()],
     },
