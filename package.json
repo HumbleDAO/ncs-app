@@ -1,37 +1,69 @@
 {
-    "name": "ncs-app",
-    "description": "No-cost Protocol",
+    "name": "@ncs/monorepo",
+    "version": "1.0.0",
+    "keywords": [
+        "ethereum",
+        "vue",
+        "nuxt",
+        "tailwind",
+        "hardhat",
+        "workspaces",
+        "yarn"
+    ],
     "private": true,
     "scripts": {
-        "build": "nuxt build",
-        "dev": "nuxt dev",
-        "generate": "nuxt generate",
-        "preview": "nuxt preview",
-        "lint": "eslint --ext .js,.ts --ignore-path .eslintignore ."
+        "nuxt-app:build": "yarn workspace @ncs/nuxt-app build --max-old-space-size=12288",
+        "nuxt-app:dev": "yarn workspace @ncs/nuxt-app dev",
+        "nuxt-app:generate": "yarn workspace @ncs/nuxt-app generate",
+        "nuxt-app:preview": "yarn workspace @ncs/nuxt-app preview",
+        "nuxt-app:lint": "yarn workspace @ncs/nuxt-app lint",
+        "build": "yarn workspace @ncs/nuxt-app build --max-old-space-size=12288",
+        "dev": "yarn workspace @ncs/nuxt-app dev",
+        "prettier": "yarn workspace @ncs/nuxt-app prettier && yarn workspace @ncs/hardhat prettier",
+        "chain": "yarn workspace @ncs/hardhat chain",
+        "fork": "yarn workspace @ncs/hardhat fork",
+        "node": "yarn workspace @ncs/hardhat chain",
+        "test": "yarn workspace @ncs/hardhat test",
+        "start": "yarn workspace @ncs/nuxt-app start",
+        "compile": "yarn workspace @ncs/hardhat compile",
+        "deploy": "yarn workspace @ncs/hardhat deploy",
+        "verify": "yarn workspace @ncs/hardhat verify",
+        "watch": "yarn workspace @ncs/hardhat watch",
+        "accounts": "yarn workspace @ncs/hardhat accounts",
+        "balance": "yarn workspace @ncs/hardhat balance",
+        "send": "yarn workspace @ncs/hardhat send",
+        "generate": "yarn workspace @ncs/hardhat generate",
+        "account": "yarn workspace @ncs/hardhat account",
+        "mineContractAddress": "cd packages/hardhat && npx hardhat mineContractAddress",
+        "wallet": "cd packages/hardhat && npx hardhat wallet",
+        "fundedwallet": "cd packages/hardhat && npx hardhat fundedwallet",
+        "flatten": "cd packages/hardhat && npx hardhat flatten",
+        "clean": "cd packages/hardhat && npx hardhat clean",
+        "postinstall": "husky install",
+        "prepare": "husky install"
     },
+    "workspaces": {
+        "packages": [
+            "packages/*"
+        ],
+        "nohoist": [
+            "**/hardhat",
+            "**/hardhat/**"
+        ]
+    },
+    "dependencies": {},
     "devDependencies": {
-        "@nuxtjs/eslint-config-typescript": "^10.0.0",
-        "@nuxtjs/tailwindcss": "^5.3.2",
-        "@pinia/nuxt": "^0.4.1",
-        "@typescript-eslint/eslint-plugin": "^5.34.0",
-        "@typescript-eslint/parser": "^5.34.0",
-        "@vue/eslint-config-standard": "^8.0.1",
-        "@vueuse/core": "^9.1.1",
-        "@vueuse/nuxt": "^9.1.1",
-        "eslint": "^8.22.0",
-        "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-nuxt": "^3.2.0",
-        "eslint-plugin-prettier": "^4.2.1",
-        "eslint-plugin-vue": "^9.3.0",
-        "nuxt": "3.0.0-rc.8",
-        "prettier": "^2.7.1",
-        "typescript": "^4.7.4",
-        "vite-plugin-eslint": "^1.8.1"
+        "husky": "^7.0.2",
+        "lint-staged": "^13.0.3"
     },
-    "dependencies": {
-        "@nuxtjs/color-mode": "^3.1.4",
-        "daisyui": "^2.24.0",
-        "ethers": "^5.7.0",
-        "vagmi": "^0.1.20"
+    "lint-staged": {
+        "packages/nuxt-app/**/*.{js,ts,vue}": [
+            "prettier --write",
+            "eslint --fix"
+        ],
+        "packages/hardhat/**/*.{js,ts,vue}": [
+            "prettier --write",
+            "eslint --fix"
+        ]
     }
 }
