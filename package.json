@@ -48,7 +48,9 @@
         ],
         "nohoist": [
             "**/hardhat",
-            "**/hardhat/**"
+            "**/hardhat/**",
+            "**/hardhat-ts",
+            "**/hardhat-ts/**"
         ]
     },
     "dependencies": {},
