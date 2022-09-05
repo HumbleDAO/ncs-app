@@ -23,13 +23,36 @@ describe('NCSubscriptionsFactory', function () {
             const { ncSubscriptionsFactory, NCSubscription, owner, otherAccount } = await deployNCSFactory()
             let beforeValue = await ncSubscriptionsFactory.totalSubscriptions()
             console.log('Before', beforeValue)
-            let res = await ncSubscriptionsFactory.creatNCSubscription('New Event', '1000000')
+            let res = await ncSubscriptionsFactory.creatNCSubscription(
+                'New Event',
+                '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
+            )
             // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
             // console.log('Subscription', subscription)
             console.log('res', res)
             let afterValue = await ncSubscriptionsFactory.totalSubscriptions()
             console.log('After', afterValue)
             expect(beforeValue).to.not.equal(afterValue)
+        })
+
+        it('Should allow to get list of subscriptions created', async function () {
+            const { ncSubscriptionsFactory, NCSubscription, owner, otherAccount } = await deployNCSFactory()
+            let subscriptionsCreatedBefore = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            console.log('subs created', subscriptionsCreatedBefore)
+
+            let res = await ncSubscriptionsFactory.creatNCSubscription(
+                'New Event',
+                '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
+            )
+            console.log('res', res)
+            let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            console.log('subs created', subscriptionsCreatedAfter)
+            expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
+
+            // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
+            // console.log('Subscription', subscription)
         })
 
         // it('Should set the right owner', async function () {
