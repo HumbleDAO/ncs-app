@@ -8,10 +8,10 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import 'hardhat/console.sol';
 
-contract NCSubscription is Ownable {
+contract NCSubscription is Initializable, OwnableUpgradeable {
     using SafeMath for uint8;
     using SafeMath for uint256;
     using SafeERC20Upgradeable for IERC20;
@@ -25,6 +25,16 @@ contract NCSubscription is Ownable {
         eventName = _eventName;
         poolSizeInUSDC = _poolSizeInUSDC;
         init(tokenAddress);
+        transferOwnership(_owner);
+    }
+
+    function initialize(
+        string memory _eventName,
+        uint256 _poolSizeInUSDC,
+        address _owner
+    ) public initializer {
+        eventName = _eventName;
+        poolSizeInUSDC = _poolSizeInUSDC;
         transferOwnership(_owner);
     }
 

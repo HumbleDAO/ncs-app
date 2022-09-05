@@ -7,11 +7,11 @@ import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import 'hardhat/console.sol';
 import './NCSubscription.sol';
 
-contract NCSubscriptionFactory is Ownable {
+contract NCSubscriptionFactory is Initializable, OwnableUpgradeable {
     using SafeMath for uint8;
     using SafeMath for uint256;
     using SafeERC20Upgradeable for IERC20;
@@ -24,10 +24,14 @@ contract NCSubscriptionFactory is Ownable {
         address owner
     );
 
+    IERC20 public USDC;
+
     NCSubscription[] public subscriptions;
     mapping(address => uint256) public ownerNCSubscriptionCount;
     mapping(address => address[]) public ownerNCSubscriptions;
     uint256 public totalSubscriptions;
+
+    function initialize() public initializer {}
 
     function creatNCSubscription(
         string memory _eventName,
