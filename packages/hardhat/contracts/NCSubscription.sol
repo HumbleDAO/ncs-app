@@ -19,26 +19,27 @@ contract NCSubscription is Ownable {
     constructor(
         string memory _eventName,
         uint256 _poolSizeInUSDC,
+        address tokenAddress,
         address _owner
     ) {
         eventName = _eventName;
         poolSizeInUSDC = _poolSizeInUSDC;
+        init(tokenAddress);
         transferOwnership(_owner);
     }
 
-    IERC20 public USDC;
-
+    IERC20 public token;
     string public eventName;
     uint256 public poolSizeInUSDC;
     uint256 public totalInvites;
 
-    function init(address _USDC) public onlyOwner {
-        USDC = IERC20(_USDC);
+    function init(address tokenAddress) public onlyOwner {
+        token = IERC20(tokenAddress);
     }
 
     function subscribe(address _newSub) external {
-        require(USDC.allowance(msg.sender, address(this)) >= poolSizeInUSDC, 'Not enough tokens');
-        USDC.transferFrom(msg.sender, address(this), poolSizeInUSDC);
+        require(token.allowance(msg.sender, address(this)) >= poolSizeInUSDC, 'Not enough tokens');
+        token.transferFrom(msg.sender, address(this), poolSizeInUSDC);
         totalInvites = totalInvites.add(1);
     }
 }

@@ -16,25 +16,34 @@ contract NCSubscriptionFactory is Ownable {
     using SafeMath for uint256;
     using SafeERC20Upgradeable for IERC20;
 
-    event NCSubscriptionCreated(address eventAddress, string eventName);
+    event NCSubscriptionCreated(
+        address eventAddress,
+        string eventName,
+        uint256 poolSizeInUSDC,
+        address tokenAddress,
+        address owner
+    );
 
-    IERC20 public USDC;
     NCSubscription[] public subscriptions;
-    mapping(address => uint256) ownerNCSubscriptionCount;
-    mapping(address => address[]) ownerNCSubscriptions;
+    mapping(address => uint256) public ownerNCSubscriptionCount;
+    mapping(address => address[]) public ownerNCSubscriptions;
     uint256 public totalSubscriptions;
 
-    function init(address _USDC) public onlyOwner {
-        USDC = IERC20(_USDC);
-    }
-
-    function creatNCSubscription(string memory _eventName, uint256 _poolSizeInUSDC) external payable returns (address) {
-        NCSubscription _newNCSubscription = new NCSubscription(_eventName, _poolSizeInUSDC, msg.sender);
+    function creatNCSubscription(
+        string memory _eventName,
+        uint256 _poolSizeInUSDC,
+        address tokenAddress
+    ) external returns (address) {
+        NCSubscription _newNCSubscription = new NCSubscription(_eventName, _poolSizeInUSDC, tokenAddress, msg.sender);
         subscriptions.push(_newNCSubscription);
         totalSubscriptions = totalSubscriptions.add(1);
         ownerNCSubscriptions[msg.sender].push(address(_newNCSubscription));
 
-        emit NCSubscriptionCreated(address(_newNCSubscription), _eventName);
+        emit NCSubscriptionCreated(address(_newNCSubscription), _eventName, _poolSizeInUSDC, tokenAddress, msg.sender);
         return address(_newNCSubscription);
+    }
+
+    function getSubscriptionsCreatedByOwner(address _owner) external view returns (address[] memory) {
+        return ownerNCSubscriptions[_owner];
     }
 }
