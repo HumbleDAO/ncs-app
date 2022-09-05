@@ -32,12 +32,11 @@
     },
     "dependencies": {
         "@nuxtjs/color-mode": "^3.1.4",
-        "@rollup/plugin-inject": "^4.0.4",
         "@vitejs/plugin-vue": "^3.0.3",
         "daisyui": "^2.24.0",
         "ethers": "^5.7.0",
-        "node-stdlib-browser": "^1.2.0",
-        "vagmi": "^0.1.20"
+        "vagmi": "^0.1.20",
+        "react-query": "^3.39.2"
     },
     "peerDependencies": {
         "react-query": "^3.39.2"

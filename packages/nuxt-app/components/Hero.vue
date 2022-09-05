@@ -1,7 +1,7 @@
 <template>
     <div class="hero min-h-screen" :data-theme="colorMode.preference">
         <div class="hero-content text-center">
-            <div class="max-w-md">
+            <div class="max-w-lg">
                 <slot name="default" />
             </div>
         </div>
