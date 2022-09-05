@@ -8,6 +8,7 @@ const chalk = require('chalk')
 import '@nomicfoundation/hardhat-chai-matchers'
 import '@tenderly/hardhat-tenderly'
 import '@nomicfoundation/hardhat-toolbox'
+import '@nomiclabs/hardhat-etherscan'
 import 'hardhat-deploy'
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils
@@ -93,11 +94,9 @@ export default {
             },
         },
         goerli: {
-            url: 'https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad', // <---- YOUR INFURA ID! (or it won't work)
+            url: 'https://opt-goerli.g.alchemy.com/v2/DmReBxowSC3sKF2JNYHDlz9i0rxn74yI', // <---- YOUR INFURA ID! (or it won't work)
             //      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXXXX/eth/goerli", // <---- YOUR MORALIS ID! (not limited to infura)
-            accounts: {
-                mnemonic: mnemonic(),
-            },
+            accounts: ['0x56bc736fd739a21c03e29af0b7a8d99620aa70c2e07789d224027c1f11d38d05'],
         },
         xdai: {
             url: 'https://rpc.xdaichain.com/',
@@ -127,11 +126,9 @@ export default {
             },
         },
         mumbai: {
-            url: 'https://rpc-mumbai.maticvigil.com',
+            url: 'https://polygon-mumbai.g.alchemy.com/v2/67FteGLZqwk9wf3Q4haD3BWJhHFF4cKF',
             // url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/polygon/mumbai", // <---- YOUR MORALIS ID! (not limited to infura)
-            accounts: {
-                mnemonic: mnemonic(),
-            },
+            accounts: [process.env.PRIVATE_KEY],
         },
         matic: {
             url: 'https://rpc-mainnet.maticvigil.com/',
@@ -319,8 +316,20 @@ export default {
             kovan: 'DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW',
             rinkeby: 'DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW',
             ropsten: 'DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW',
-            // add other network's API key here
+            polygonMumbai: process.env.ETHER_SCAN_POLYGON_API_KEY,
+            optimisticEthereum: 'YOUR_OPTIMISTIC_ETHERSCAN_API_KEY',
+            arbitrumOne: 'YOUR_ARBISCAN_API_KEY', // add other network's API key here
         },
+        customChains: [
+            {
+                network: 'rinkeby',
+                chainId: 4,
+                urls: {
+                    apiURL: 'https://api-rinkeby.etherscan.io/api',
+                    browserURL: 'https://rinkeby.etherscan.io',
+                },
+            },
+        ],
     },
     abiExporter: {
         path: '../react-app/src/contracts/ABI',
