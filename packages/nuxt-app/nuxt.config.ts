@@ -20,6 +20,10 @@ export default defineNuxtConfig({
         ],
     ],
 
+    ssr: false,
+
+    target: 'static',
+
     vite: {
         plugins: [eslintPlugin()],
     },

@@ -63,7 +63,7 @@
             "prettier --write",
             "eslint --fix"
         ],
-        "packages/hardhat/**/*.{js,ts,vue}": [
+        "packages/hardhat/**/*.{js,ts}": [
             "prettier --write",
             "eslint --fix"
         ]
