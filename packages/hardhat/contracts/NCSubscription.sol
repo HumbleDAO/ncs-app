@@ -10,36 +10,52 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import 'hardhat/console.sol';
+import './NCSNFT.sol';
 
 contract NCSubscription is Ownable {
-    using SafeMath for uint8;
     using SafeMath for uint256;
     using SafeERC20Upgradeable for IERC20;
 
+    event NCSNFTMinted(address eventAddress, address owner, uint256 tokenId);
+
     constructor(
         string memory _eventName,
-        uint256 _poolSizeInUSDC,
+        uint256 _poolSize,
         address tokenAddress,
         address _owner
     ) {
         eventName = _eventName;
-        poolSizeInUSDC = _poolSizeInUSDC;
-        init(tokenAddress);
+        poolSize = _poolSize;
+        token = IERC20(tokenAddress);
         transferOwnership(_owner);
+        nft = new NCSNFT(_eventName, 'NCS');
+        nftAddress = address(nft);
     }
 
+    NCSNFT nft;
+    address public nftAddress;
     IERC20 public token;
     string public eventName;
-    uint256 public poolSizeInUSDC;
-    uint256 public totalInvites;
+    uint256 public poolSize;
+    uint256 public totalSubscriptions;
+    mapping(address => uint256) public subscriptionsMap;
+    address[] subscribers;
 
-    function init(address tokenAddress) public onlyOwner {
-        token = IERC20(tokenAddress);
+    function subscribe() external {
+        require(token.allowance(msg.sender, address(this)) >= poolSize, 'Not enough tokens');
+        token.transferFrom(msg.sender, address(this), poolSize);
+        uint256 id = nft.mint(msg.sender);
+        totalSubscriptions = totalSubscriptions.add(1);
+        subscriptionsMap[msg.sender] = id;
+        subscribers.push(msg.sender);
     }
 
-    function subscribe(address _newSub) external {
-        require(token.allowance(msg.sender, address(this)) >= poolSizeInUSDC, 'Not enough tokens');
-        token.transferFrom(msg.sender, address(this), poolSizeInUSDC);
-        totalInvites = totalInvites.add(1);
+    function unsubscribe() external {
+        // todo: require allowance of transfer
+        require(nft.isApprovedForAll(msg.sender, address(this)), 'Subscriptions are not approved for closing');
+        require(nft.balanceOf(msg.sender) >= 0, 'No Subscription');
+        nft.transferFrom(address(this), msg.sender, subscriptionsMap[msg.sender]);
+        token.transferFrom(address(this), msg.sender, poolSize);
+        totalSubscriptions = totalSubscriptions.sub(1);
     }
 }
