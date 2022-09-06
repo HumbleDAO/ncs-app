@@ -2,19 +2,19 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
-    "txHash": "0xd6f0253a1e5203e7e02c4d6928037f6f3cd8052c39ddd8c7b5c85ffd42576ffc"
+    "txHash": "0xd571288c678ca83b0d6cf9d2a738ae15ee6f208bf1b9b3ce1ad698daae04b7e8"
   },
   "proxies": [
     {
       "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
-      "txHash": "0x677344948d5880f2870657adbde2429257b22039301a2b9ec2b9caed3db2c9bf",
+      "txHash": "0x4ef7b141ec8c5ef8684c1f3a9d118f39e43cc240b39150553977468938f56e1d",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "b9c3d97dd469376152b8052fa709a8ad2d655be1308a0911592f65a19e665257": {
+    "194432e27e85d9d1dbf710b8005b378b503d777bc64a4fc57855c4b1126c30ef": {
       "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-      "txHash": "0xeeb78f5dfdb161a82769682c6f4fef093ca0073993e2e4be643edcbe6315ca4e",
+      "txHash": "0x20dd50d645ae4117377b87134e14a0ebce98a91a71e503ac2e00e671210b786a",
       "layout": {
         "storage": [
           {
@@ -35,9 +35,33 @@
             "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
           },
           {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
             "label": "USDC",
-            "offset": 2,
-            "slot": "0",
+            "offset": 0,
+            "slot": "101",
             "type": "t_contract(IERC20)1626",
             "contract": "NCSubscriptionFactory",
             "src": "contracts/NCSubscriptionFactory.sol:27"
@@ -45,7 +69,7 @@
           {
             "label": "subscriptions",
             "offset": 0,
-            "slot": "1",
+            "slot": "102",
             "type": "t_array(t_contract(NCSubscription)2744)dyn_storage",
             "contract": "NCSubscriptionFactory",
             "src": "contracts/NCSubscriptionFactory.sol:29"
@@ -53,7 +77,7 @@
           {
             "label": "ownerNCSubscriptionCount",
             "offset": 0,
-            "slot": "2",
+            "slot": "103",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "NCSubscriptionFactory",
             "src": "contracts/NCSubscriptionFactory.sol:30"
@@ -61,7 +85,7 @@
           {
             "label": "ownerNCSubscriptions",
             "offset": 0,
-            "slot": "3",
+            "slot": "104",
             "type": "t_mapping(t_address,t_array(t_address)dyn_storage)",
             "contract": "NCSubscriptionFactory",
             "src": "contracts/NCSubscriptionFactory.sol:31"
@@ -69,7 +93,7 @@
           {
             "label": "totalSubscriptions",
             "offset": 0,
-            "slot": "4",
+            "slot": "105",
             "type": "t_uint256",
             "contract": "NCSubscriptionFactory",
             "src": "contracts/NCSubscriptionFactory.sol:32"
@@ -87,6 +111,14 @@
           "t_array(t_contract(NCSubscription)2744)dyn_storage": {
             "label": "contract NCSubscription[]",
             "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
           },
           "t_bool": {
             "label": "bool",

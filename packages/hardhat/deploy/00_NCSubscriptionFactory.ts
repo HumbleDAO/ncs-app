@@ -23,15 +23,16 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
         // args: [ "Hello", ethers.utils.parseEther("1.5") ],
         log: true,
         waitConfirmations: 5,
-        proxy: {
-            proxyContract: 'OpenZeppelinTransparentProxy',
-            execute: {
-                init: {
-                    methodName: 'initialize',
-                    args: [],
-                },
-            },
-        },
+        // TODO: uncomment when everything is upgrade safe
+        // proxy: {
+        //     proxyContract: 'OpenZeppelinTransparentProxy',
+        //     execute: {
+        //         init: {
+        //             methodName: 'initialize',
+        //             args: [],
+        //         },
+        //     },
+        // },
     })
 
     // Getting a previously deployed contract

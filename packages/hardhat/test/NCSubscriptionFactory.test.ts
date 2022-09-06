@@ -15,26 +15,24 @@ describe('NCSubscriptionsFactory', function () {
         ;[owner, otherAccount] = await ethers.getSigners()
         ncSubscriptionsFactory = await (await ethers.getContractFactory('NCSubscriptionFactory')).deploy()
         ncSubscription = await ethers.getContractFactory('NCSubscription')
-
-        // fix 'Ownable: caller is not the owner' error
-        await ncSubscription.transferOwnership(owner.address)
-    })
-
-    describe('NCSubscriptionFactory', function () {
-        it('should be deployed', async function () {
-            const [deployer] = await ethers.getSigners()
-            const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
-            const instance = await upgrades.deployProxy(NCSubscriptionFactory)
-            await instance.deployed()
-            console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
-            expect(instance.address).to.be.properAddress
-        })
     })
 
     describe('createNCSubscription', function () {
+        it('should be deployed', async function () {
+            const [deployer] = await ethers.getSigners()
+            const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
+            const instance = await NCSubscriptionFactory.deploy()
+
+            // TODO: uncomment when everything is upgrade safe
+            // const instance = await upgrades.deployProxy(NCSubscriptionFactory)
+            // await instance.deployed()
+            // console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
+            expect(instance.address).to.be.properAddress
+        })
+
         it('Should create a new subscription', async function () {
             let beforeValue = await ncSubscriptionsFactory.totalSubscriptions()
-            console.log('Before', beforeValue)
+            // console.log('Before', beforeValue)
             let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
@@ -42,9 +40,9 @@ describe('NCSubscriptionsFactory', function () {
             )
             // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
             // console.log('Subscription', subscription)
-            console.log('res', res)
+            // console.log('res', res)
             let afterValue = await ncSubscriptionsFactory.totalSubscriptions()
-            console.log('After', afterValue)
+            // console.log('After', afterValue)
             expect(beforeValue).to.not.equal(afterValue)
         })
 
@@ -57,9 +55,9 @@ describe('NCSubscriptionsFactory', function () {
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
-            console.log('res', res)
+            // console.log('res', res)
             let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
-            console.log('subs created', subscriptionsCreatedAfter)
+            // console.log('subs created', subscriptionsCreatedAfter)
             expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
 
             // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
