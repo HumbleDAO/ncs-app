@@ -35,21 +35,18 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     })
 
     // Getting a previously deployed contract
-    const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
+    // const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
     // const instance = await upgrades.deployProxy(NCSubscriptionFactory)
     // await instance.deployed()
     // console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
 
-    /*  await NCSubscriptionFactory.setPurpose("Hello");
+    // await NCSubscriptionFactory.setPurpose('Hello')
 
     // To take ownership of NCSubscriptionFactory using the ownable library uncomment next line and add the
     // address you want to be the owner.
 
-    await NCSubscriptionFactory.transferOwnership(
-      "ADDRESS_HERE"
-    );
-    //const NCSubscriptionFactory = await ethers.getContractAt('NCSubscriptionFactory', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
-  */
+    // await NCSubscriptionFactory.transferOwnership(deployer.address)
+    // const NCSubscriptionFactory = await ethers.getContractAt('NCSubscriptionFactory', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
 
     /*
   //If you want to send value to an address from the deployer

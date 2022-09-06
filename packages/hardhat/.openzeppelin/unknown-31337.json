@@ -1,0 +1,123 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+    "txHash": "0xd6f0253a1e5203e7e02c4d6928037f6f3cd8052c39ddd8c7b5c85ffd42576ffc"
+  },
+  "proxies": [
+    {
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "txHash": "0x677344948d5880f2870657adbde2429257b22039301a2b9ec2b9caed3db2c9bf",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "b9c3d97dd469376152b8052fa709a8ad2d655be1308a0911592f65a19e665257": {
+      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      "txHash": "0xeeb78f5dfdb161a82769682c6f4fef093ca0073993e2e4be643edcbe6315ca4e",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "USDC",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(IERC20)1626",
+            "contract": "NCSubscriptionFactory",
+            "src": "contracts/NCSubscriptionFactory.sol:27"
+          },
+          {
+            "label": "subscriptions",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_contract(NCSubscription)2744)dyn_storage",
+            "contract": "NCSubscriptionFactory",
+            "src": "contracts/NCSubscriptionFactory.sol:29"
+          },
+          {
+            "label": "ownerNCSubscriptionCount",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "NCSubscriptionFactory",
+            "src": "contracts/NCSubscriptionFactory.sol:30"
+          },
+          {
+            "label": "ownerNCSubscriptions",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_address,t_array(t_address)dyn_storage)",
+            "contract": "NCSubscriptionFactory",
+            "src": "contracts/NCSubscriptionFactory.sol:31"
+          },
+          {
+            "label": "totalSubscriptions",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "NCSubscriptionFactory",
+            "src": "contracts/NCSubscriptionFactory.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_contract(NCSubscription)2744)dyn_storage": {
+            "label": "contract NCSubscription[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20)1626": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(NCSubscription)2744": {
+            "label": "contract NCSubscription",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_array(t_address)dyn_storage)": {
+            "label": "mapping(address => address[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

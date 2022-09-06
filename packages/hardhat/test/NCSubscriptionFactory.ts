@@ -1,29 +1,41 @@
 import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 import { expect } from 'chai'
-import { ethers } from 'hardhat'
+import { ethers, upgrades } from 'hardhat'
+
+// test NCSubscriptionsFactory as a proxy and upgradeable contract that uses openzeppelin
 
 describe('NCSubscriptionsFactory', function () {
-    // We define a fixture to reuse the same setup in every test.
-    // We use loadFixture to run this setup once, snapshot that state,
-    // and reset Hardhat Network to that snapshot in every test.
-    async function deployNCSFactory() {
-        const [owner, otherAccount] = await ethers.getSigners()
+    let ncSubscriptionsFactory: any
+    let ncSubscription: any
+    let owner: any
+    let otherAccount: any
 
-        const NCSubscriptionsFactory = await ethers.getContractFactory('NCSubscriptionFactory')
-        const NCSubscription = await ethers.getContractFactory('NCSubscription')
+    this.beforeEach(async () => {
+        ;[owner, otherAccount] = await ethers.getSigners()
+        ncSubscriptionsFactory = await (await ethers.getContractFactory('NCSubscriptionFactory')).deploy()
+        ncSubscription = await ethers.getContractFactory('NCSubscription')
 
-        const ncSubscriptionsFactory = await NCSubscriptionsFactory.deploy()
+        // fix 'Ownable: caller is not the owner' error
+        await ncSubscription.transferOwnership(owner.address)
+    })
 
-        return { ncSubscriptionsFactory, NCSubscription, owner, otherAccount }
-    }
+    describe('NCSubscriptionFactory', function () {
+        it('should be deployed', async function () {
+            const [deployer] = await ethers.getSigners()
+            const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
+            const instance = await upgrades.deployProxy(NCSubscriptionFactory)
+            await instance.deployed()
+            console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
+            expect(instance.address).to.be.properAddress
+        })
+    })
 
-    describe('creatNCSubscription', function () {
+    describe('createNCSubscription', function () {
         it('Should create a new subscription', async function () {
-            const { ncSubscriptionsFactory, NCSubscription, owner, otherAccount } = await deployNCSFactory()
             let beforeValue = await ncSubscriptionsFactory.totalSubscriptions()
             console.log('Before', beforeValue)
-            let res = await ncSubscriptionsFactory.creatNCSubscription(
+            let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
@@ -37,11 +49,10 @@ describe('NCSubscriptionsFactory', function () {
         })
 
         it('Should allow to get list of subscriptions created', async function () {
-            const { ncSubscriptionsFactory, NCSubscription, owner, otherAccount } = await deployNCSFactory()
             let subscriptionsCreatedBefore = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
             console.log('subs created', subscriptionsCreatedBefore)
 
-            let res = await ncSubscriptionsFactory.creatNCSubscription(
+            let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
