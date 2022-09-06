@@ -3,6 +3,10 @@ import eslintPlugin from 'vite-plugin-eslint'
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+    alias: {
+        contracts: '/<rootDir>/contracts',
+        helpers: '/<rootDir>/helpers',
+    },
     modules: [
         '@nuxtjs/tailwindcss',
         '@nuxtjs/color-mode',
