@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAccount, useBalance, useConnect, useEnsName, useDisconnect } from 'vagmi'
+import { useAccount, useBalance, useConnect, useEnsName, useDisconnect, useNetwork } from 'vagmi'
 import { InjectedConnector } from 'vagmi/connectors/injected'
 
 const { address } = useAccount()
@@ -39,6 +39,15 @@ const { connect } = useConnect({
 })
 
 const { disconnect } = useDisconnect()
+
+const { loadContracts } = userContractsConfig()
+console.log('ALL_CONTRACTS: ', await loadContracts())
+
+// const { chain, chains } = useNetwork()
+
+// console.log('CHAIN: ', chain)
+
+// console.log('CHAINS: ', chains)
 
 const colorMode = useColorMode()
 </script>
