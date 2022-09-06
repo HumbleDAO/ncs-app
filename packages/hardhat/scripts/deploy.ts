@@ -1,3 +1,10 @@
+/*
+
+
+    DEPRECATED in favor of hardhat-deploy. See https://github.com/wighawag/hardhat-deploy
+
+*/
+
 import { ethers } from 'hardhat'
 
 async function main() {

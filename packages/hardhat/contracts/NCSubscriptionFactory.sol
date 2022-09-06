@@ -29,7 +29,7 @@ contract NCSubscriptionFactory is Ownable {
     mapping(address => address[]) public ownerNCSubscriptions;
     uint256 public totalSubscriptions;
 
-    function creatNCSubscription(
+    function createNCSubscription(
         string memory _eventName,
         uint256 _poolSizeInUSDC,
         address tokenAddress

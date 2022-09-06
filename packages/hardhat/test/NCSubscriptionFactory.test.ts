@@ -1,54 +1,63 @@
 import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 import { expect } from 'chai'
-import { ethers } from 'hardhat'
+import { ethers, upgrades } from 'hardhat'
+
+// test NCSubscriptionsFactory as a proxy and upgradeable contract that uses openzeppelin
 
 describe('NCSubscriptionsFactory', function () {
-    // We define a fixture to reuse the same setup in every test.
-    // We use loadFixture to run this setup once, snapshot that state,
-    // and reset Hardhat Network to that snapshot in every test.
-    async function deployNCSFactory() {
-        const [owner, otherAccount] = await ethers.getSigners()
+    let ncSubscriptionsFactory: any
+    let ncSubscription: any
+    let owner: any
+    let otherAccount: any
 
-        const NCSubscriptionsFactory = await ethers.getContractFactory('NCSubscriptionFactory')
-        const NCSubscription = await ethers.getContractFactory('NCSubscription')
+    this.beforeEach(async () => {
+        ;[owner, otherAccount] = await ethers.getSigners()
+        ncSubscriptionsFactory = await (await ethers.getContractFactory('NCSubscriptionFactory')).deploy()
+        ncSubscription = await ethers.getContractFactory('NCSubscription')
+    })
 
-        const ncSubscriptionsFactory = await NCSubscriptionsFactory.deploy()
+    describe('createNCSubscription', function () {
+        it('should be deployed', async function () {
+            const [deployer] = await ethers.getSigners()
+            const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
+            const instance = await NCSubscriptionFactory.deploy()
 
-        return { ncSubscriptionsFactory, NCSubscription, owner, otherAccount }
-    }
+            // TODO: uncomment when everything is upgrade safe
+            // const instance = await upgrades.deployProxy(NCSubscriptionFactory)
+            // await instance.deployed()
+            // console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
+            expect(instance.address).to.be.properAddress
+        })
 
-    describe('creatNCSubscription', function () {
         it('Should create a new subscription', async function () {
-            const { ncSubscriptionsFactory, NCSubscription, owner, otherAccount } = await deployNCSFactory()
             let beforeValue = await ncSubscriptionsFactory.totalSubscriptions()
-            console.log('Before', beforeValue)
-            let res = await ncSubscriptionsFactory.creatNCSubscription(
+            // console.log('Before', beforeValue)
+            let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
             // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
             // console.log('Subscription', subscription)
-            console.log('res', res)
+            // console.log('res', res)
             let afterValue = await ncSubscriptionsFactory.totalSubscriptions()
-            console.log('After', afterValue)
+            // console.log('After', afterValue)
             expect(beforeValue).to.not.equal(afterValue)
         })
 
         it('Should allow to get list of subscriptions created', async function () {
-            const { ncSubscriptionsFactory, NCSubscription, owner, otherAccount } = await deployNCSFactory()
             let subscriptionsCreatedBefore = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
             console.log('subs created', subscriptionsCreatedBefore)
 
-            let res = await ncSubscriptionsFactory.creatNCSubscription(
+            let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
-            console.log('res', res)
+            // console.log('res', res)
             let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
-            console.log('subs created', subscriptionsCreatedAfter)
+            // console.log('subs created', subscriptionsCreatedAfter)
             expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
 
             // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
