@@ -5,10 +5,10 @@ import { loadAppContracts } from '@/helpers/loadAppContracts'
 export const userContractsConfig = defineStore('contractsConfig', () => {
     async function loadContracts() {
         const { deployedContracts } = await loadAppContracts()
-        console.log('CONTRACTS_DEPLOYED: ', deployedContracts)
+        // console.log('CONTRACTS_DEPLOYED: ', deployedContracts)
         let contracts = []
         Object.keys(deployedContracts).forEach((CHAIN_ID) => {
-            console.log('CHAIN_ID: ', CHAIN_ID)
+            // console.log('CHAIN_ID: ', CHAIN_ID)
             Object.keys(deployedContracts[CHAIN_ID]).forEach((DEPLOYED_NETWORK) => {
                 // console.log('DEPLOYED_NETWORK: ', DEPLOYED_NETWORK)
                 // console.log('CONTRACT_ADDRESS: ', deployedContracts[CHAIN_ID][DEPLOYED_NETWORK])

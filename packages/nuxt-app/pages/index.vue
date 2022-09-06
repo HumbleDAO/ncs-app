@@ -3,11 +3,13 @@
         <hero>
             <h1 class="text-5xl font-bold">No-Cost Subscription</h1>
             <p class="py-6"></p>
-            <label for="main-drawer" class="btn btn-primary drawer-button rounded-none">Open drawer</label>
+            <br />
 
+            <label for="main-drawer" class="btn btn-primary drawer-button rounded-none">Open drawer</label>
             <button class="btn btn-primary rounded-none" @click="connect">Connect</button>
             <button class="btn btn-primary rounded-none" @click="disconnect">Disconnect</button>
 
+            <br />
             <br />
 
             <div v-if="ensName">Connected as {{ ensName }}</div>
@@ -16,12 +18,22 @@
             <br />
             <label>Balance</label>
             <div>{{ data?.symbol }} {{ data?.formatted }}</div>
+            <br />
+            <div v-if="chain">Connected to {{ chain.name }}</div>
+            <br />
+            <button v-for="x in chains" :key="x.id" class="btn mx-1 rounded-none" @click="switchNetwork(x.id)">
+                {{ x.name }}
+                {{ isLoading && pendingChainId === x.id ? ' (switching)' : '' }}
+            </button>
+            <div v-if="error">
+                {{ error.message }}
+            </div>
         </hero>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useAccount, useBalance, useConnect, useEnsName, useDisconnect, useNetwork } from 'vagmi'
+import { useAccount, useBalance, useConnect, useEnsName, useDisconnect, useNetwork, useSwitchNetwork } from 'vagmi'
 import { InjectedConnector } from 'vagmi/connectors/injected'
 
 const { address } = useAccount()
@@ -31,7 +43,7 @@ const { data: ensName } = useEnsName({
 })
 
 const { data } = useBalance({
-    addressOrName: computed(() => ensName ?? address),
+    addressOrName: computed(() => address),
 })
 
 const { connect } = useConnect({
@@ -40,14 +52,16 @@ const { connect } = useConnect({
 
 const { disconnect } = useDisconnect()
 
+const { chain } = useNetwork()
+const { chains, error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork()
+
+console.log('CHAIN: ', chain.value)
+
+console.log('CHAINS: ', chains.value)
+
 const { loadContracts } = userContractsConfig()
-console.log('ALL_CONTRACTS: ', await loadContracts())
-
-// const { chain, chains } = useNetwork()
-
-// console.log('CHAIN: ', chain)
-
-// console.log('CHAINS: ', chains)
+const contracts = await loadContracts()
+console.log('ALL_CONTRACTS: ', contracts)
 
 const colorMode = useColorMode()
 </script>
