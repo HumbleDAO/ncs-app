@@ -27,6 +27,7 @@ describe('NCSubscriptionsFactory', function () {
             // const instance = await upgrades.deployProxy(NCSubscriptionFactory)
             // await instance.deployed()
             // console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
+
             expect(instance.address).to.be.properAddress
         })
 
