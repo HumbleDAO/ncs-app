@@ -36,6 +36,8 @@
 import { useAccount, useBalance, useConnect, useEnsName, useDisconnect, useNetwork, useSwitchNetwork } from 'vagmi'
 import { InjectedConnector } from 'vagmi/connectors/injected'
 
+import { INetworkDetails } from '@/composables/useNetworkDetailsStore'
+
 const { address } = useAccount()
 
 const { data: ensName } = useEnsName({
@@ -49,18 +51,19 @@ const { data } = useBalance({
 const { connect } = useConnect({
     connector: new InjectedConnector(),
 })
-
 const { disconnect } = useDisconnect()
 
 const { chain } = useNetwork()
 const { chains, error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork()
 
-console.log('CHAIN: ', chain.value)
+useNetworkDetailsStore().$patch((state: INetworkDetails) => {
+    state.network = chain.value?.name
+    state.selectedChainId = chain.value?.id
+    state.availableChains = chains.value
+})
 
-console.log('CHAINS: ', chains.value)
-
-const { loadContracts } = userContractsConfig()
-const contracts = await loadContracts()
+const { loadContracts, contracts } = useContractsStore()
+await loadContracts()
 console.log('ALL_CONTRACTS: ', contracts)
 
 const colorMode = useColorMode()
