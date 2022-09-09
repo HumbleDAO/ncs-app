@@ -21,6 +21,15 @@
             <br />
             <div v-if="chain">Connected to {{ chain.name }}</div>
             <br />
+            <div v-if="contractsAddresses.length">
+                <div v-for="contract in contractsAddresses" :key="contract.name" class="flex flex-col">
+                    <label for="contract-name">
+                        {{ contract.name }}
+                    </label>
+                    <label for="contract-address">{{ contract.address }}</label>
+                </div>
+            </div>
+            <br />
             <button v-for="x in chains" :key="x.id" class="btn mx-1 rounded-none" @click="switchNetwork(x.id)">
                 {{ x.name }}
                 {{ isLoading && pendingChainId === x.id ? ' (switching)' : '' }}
@@ -82,4 +91,11 @@ const loadedContracts = await loadContracts()
 console.log('INIT_LOADED CONTRACTS', loadedContracts)
 const { NCSubscriptionFactory } = loadedContracts.value
 console.log('NCSubscriptionFactory', NCSubscriptionFactory.address)
+
+const contractsAddresses = computed(() =>
+    Object.keys(loadedContracts.value).map((key) => ({
+        name: key,
+        address: loadedContracts.value[key].address,
+    }))
+)
 </script>
