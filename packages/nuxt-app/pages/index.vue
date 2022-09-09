@@ -36,6 +36,18 @@
 import { useAccount, useBalance, useConnect, useEnsName, useDisconnect, useNetwork, useSwitchNetwork } from 'vagmi'
 import { InjectedConnector } from 'vagmi/connectors/injected'
 
+import { INetworkDetails } from '@/composables/useNetworkDetailsStore'
+
+const colorMode = useColorMode()
+
+const { loadContracts } = useContractsStore()
+
+const { connect } = useConnect({
+    connector: new InjectedConnector(),
+})
+
+const { disconnect } = useDisconnect()
+
 const { address } = useAccount()
 
 const { data: ensName } = useEnsName({
@@ -46,22 +58,28 @@ const { data } = useBalance({
     addressOrName: computed(() => address),
 })
 
-const { connect } = useConnect({
-    connector: new InjectedConnector(),
+const { chain } = useNetwork()
+const { chains, error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
+    chainId: 80001,
+    onSuccess: async (data) => {
+        const loadedContracts = await loadContracts()
+        console.log('LOADED_CONTRACTS_ON_CURRENT_CHAIN: \n', loadedContracts.value.NCSubscriptionFactory.address)
+        useNetworkDetailsStore().$patch((state: INetworkDetails) => {
+            state.selectedChainId = data.id
+            state.network = data.network
+        })
+    },
 })
 
-const { disconnect } = useDisconnect()
+useNetworkDetailsStore().$patch((state: INetworkDetails) => {
+    state.network = chain.value?.name
 
-const { chain } = useNetwork()
-const { chains, error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork()
+    state.selectedChainId = chain.value?.id
+    state.availableChains = chains.value
+})
 
-console.log('CHAIN: ', chain.value)
-
-console.log('CHAINS: ', chains.value)
-
-const { loadContracts } = userContractsConfig()
-const contracts = await loadContracts()
-console.log('ALL_CONTRACTS: ', contracts)
-
-const colorMode = useColorMode()
+const loadedContracts = await loadContracts()
+console.log('INIT_LOADED CONTRACTS', loadedContracts)
+const { NCSubscriptionFactory } = loadedContracts.value
+console.log('NCSubscriptionFactory', NCSubscriptionFactory.address)
 </script>
