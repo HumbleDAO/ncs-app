@@ -2,17 +2,21 @@
 import { ethers } from 'ethers'
 import { groupBy } from 'lodash'
 import { useNetwork } from 'vagmi'
+
 import { loadAppContracts } from '@/helpers/loadAppContracts'
+
 import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStore'
 
 export const useContractsStore = defineStore('contracts', () => {
+    const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
-    const contracts = ref([] as IContract[])
+    const _contracts = reactive({} as any)
+    const contracts = reactive({} as any)
 
     async function loadContracts() {
         const { deployedContracts } = await loadAppContracts()
+        const preparedContracts = [] as any
         const deployedChains = []
-        let _contracts = []
 
         Object.keys(deployedContracts).forEach((CHAIN_ID) => {
             deployedChains.push(parseInt(CHAIN_ID))
@@ -26,44 +30,52 @@ export const useContractsStore = defineStore('contracts', () => {
                     // contract
 
                     const contractAddressAndAbi = deployedContracts[CHAIN_ID][DEPLOYED_NETWORK].contracts[CONTRACT_NAME]
-                    console.log('CONTRACT_ADDRESS_AND_ABI: ', contractAddressAndAbi)
-                    _contracts.push({
+                    // console.log('CONTRACT_ADDRESS_AND_ABI: ', contractAddressAndAbi)
+                    preparedContracts.push({
                         // ...contractAddressAndAbi,
-                        abi: contractAddressAndAbi.abi,
                         chainId: CHAIN_ID,
                         name: CONTRACT_NAME,
-                        network: DEPLOYED_NETWORK,
                         instance: new ethers.Contract(
-                            CONTRACT_NAME,
+                            contractAddressAndAbi.address,
                             contractAddressAndAbi.abi,
-                            ethers.getDefaultProvider()
+                            ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
+                                alchemy: runtimeConfig.alchemy.apiKey,
+                            })
                         ),
                     })
                 })
             })
         })
 
-        _contracts = groupBy(_contracts, 'chainId')
-
         networkDetailsStore.$patch((state: INetworkDetails) => {
             state.deployedChains = deployedChains
         })
 
-        contracts.value = _contracts[useNetwork().chain.value?.id]
-        console.log('CONTRACTS: ', contracts.value)
-        return contracts.value
+        const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
+        const { chain } = useNetwork()
+        const target = {}
 
-        // should we return all available contracts or just the ones for the current chain?
-        // return _contracts
+        allContractsGroupedByChainId[chain.value?.id ?? runtimeConfig.public.supportedChains[80001]].forEach(
+            ({ name, instance }) => {
+                target[name] = instance
+            }
+        )
+
+        _contracts.value = target
+
+        return _contracts
     }
 
-    return { loadContracts, contracts: computed(() => contracts.value) }
+    watch(
+        () => _contracts.value,
+        (newContracts) => {
+            contracts.value = newContracts
+        }
+    )
+
+    return { loadContracts, contracts: contracts.value }
 })
 
 export interface IContract {
-    abi?: object
-    chainId?: string
-    name?: string
-    network?: string
-    instance: ethers.Contract
+    [key: string]: ethers.Contract
 }
