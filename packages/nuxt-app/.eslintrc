@@ -20,6 +20,7 @@
         "prettier/prettier": "error",
         "vue/multi-word-component-names": 0,
         // "vue/script-setup-no-uses-vars": "off"
-        "vue/no-multiple-template-root": "off"
+        "vue/no-multiple-template-root": "off",
+        "linebreak-style": 0
     }
 }
