@@ -8,12 +8,18 @@ import { loadAppContracts } from '@/helpers/loadAppContracts'
 import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStore'
 
 export const useContractsStore = defineStore('contracts', () => {
+    const { chain } = useNetwork()
+    const { isChainSupported } = useSupportedChainsStore()
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
     const _contracts = reactive({} as any)
     const contracts = reactive({} as any)
 
     async function loadContracts() {
+        if (!isChainSupported(chain.value?.id)) {
+            return console.log(`Chain ${chain.value?.id} is not supported`)
+        }
+
         const { deployedContracts } = await loadAppContracts()
         const preparedContracts = [] as any
         const deployedChains = []
@@ -52,8 +58,10 @@ export const useContractsStore = defineStore('contracts', () => {
         })
 
         const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
-        const { chain } = useNetwork()
         const target = {}
+
+        console.log('allContractsGroupedByChainId: ', allContractsGroupedByChainId)
+        console.log('chain.value?.id: ', chain.value?.id)
 
         allContractsGroupedByChainId[chain.value?.id ?? runtimeConfig.public.supportedChains[80001]].forEach(
             ({ name, instance }) => {
