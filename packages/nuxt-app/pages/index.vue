@@ -1,7 +1,7 @@
 <template>
     <div class="flex h-screen" :data-theme="colorMode.preference">
         <hero>
-            <h1 class="text-5xl font-bold">No-Cost Subscription</h1>
+            <h1 class="text-5xl font-bold">My App Name</h1>
             <p class="py-6"></p>
             <br />
 
