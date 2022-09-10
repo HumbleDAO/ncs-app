@@ -1,7 +1,7 @@
 import { defineNuxtConfig } from 'nuxt'
 import eslintPlugin from 'vite-plugin-eslint'
 
-const SUPPORTED_CHAINS = {
+const SUPPORTED_CHAINS_METADATA = {
     31337: {
         network: 'Hardhat',
         chainId: 31337,
@@ -41,8 +41,8 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            supportedChains: SUPPORTED_CHAINS,
-            alchemy: SUPPORTED_CHAINS[process.env.CHAIN_ID],
+            supportedChainsMetadata: SUPPORTED_CHAINS_METADATA,
+            alchemy: SUPPORTED_CHAINS_METADATA[process.env.CHAIN_ID],
         },
     },
 
