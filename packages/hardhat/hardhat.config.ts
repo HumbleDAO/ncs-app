@@ -1,16 +1,20 @@
-import { HardhatUserConfig } from 'hardhat/config'
-
 require('dotenv').config()
-const { utils } = require('ethers')
-const fs = require('fs')
-const chalk = require('chalk')
+import { HardhatUserConfig, task } from 'hardhat/config'
+import { generateMnemonic, mnemonicToSeed } from 'bip39'
+import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
+import { JsonRpcSigner } from '@ethersproject/providers'
+import { hdkey } from 'ethereumjs-wallet'
+import { utils } from 'ethers'
 
+import fs from 'fs'
+import chalk from 'chalk'
+
+// import '@tenderly/hardhat-tenderly'
 import 'hardhat-abi-exporter'
 import '@nomiclabs/hardhat-ethers'
 import '@openzeppelin/hardhat-upgrades'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomicfoundation/hardhat-chai-matchers'
-// import '@tenderly/hardhat-tenderly'
 import '@nomicfoundation/hardhat-toolbox'
 import 'hardhat-deploy'
 
@@ -41,7 +45,7 @@ function mnemonic() {
     return ''
 }
 
-export default {
+const hardhatConfig: HardhatUserConfig = {
     /**
      * gas reporter configuration that let's you know
      * an estimate of gas for contract deployments and function calls
@@ -49,7 +53,7 @@ export default {
      */
     gasReporter: {
         currency: 'USD',
-        coinmarketcap: process.env.COINMARKETCAP || null,
+        coinmarketcap: process.env.COINMARKETCAP ?? undefined,
         enabled: true,
     },
 
@@ -131,7 +135,7 @@ export default {
         mumbai: {
             url: 'https://polygon-mumbai.g.alchemy.com/v2/67FteGLZqwk9wf3Q4haD3BWJhHFF4cKF',
             // url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/polygon/mumbai", // <---- YOUR MORALIS ID! (not limited to infura)
-            accounts: [process.env.MUMBAI_DEPLOYER_PRIV_KEY],
+            accounts: [process.env.MUMBAI_DEPLOYER_PRIV_KEY ?? ''],
         },
         // matic: {
         //     url: 'https://rpc-mainnet.maticvigil.com/',
@@ -304,9 +308,9 @@ export default {
             },
         ],
     },
-    ovm: {
-        solcVersion: '0.7.6',
-    },
+    // ovm: {
+    //     solcVersion: '0.7.6',
+    // },
     namedAccounts: {
         deployer: {
             default: 0, // here this will by default take the first account as deployer
@@ -319,7 +323,7 @@ export default {
             kovan: 'DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW',
             rinkeby: 'DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW',
             ropsten: 'DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW',
-            polygonMumbai: process.env.ETHER_SCAN_POLYGON_API_KEY,
+            polygonMumbai: process.env.ETHER_SCAN_POLYGON_API_KEY ?? '',
             optimisticEthereum: 'YOUR_OPTIMISTIC_ETHERSCAN_API_KEY',
             arbitrumOne: 'YOUR_ARBISCAN_API_KEY', // add other network's API key here
         },
@@ -347,7 +351,7 @@ export default {
 
 const DEBUG = false
 
-function debug(text) {
+function debug(text: string) {
     if (DEBUG) {
         console.log(text)
     }
@@ -386,7 +390,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
         // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
         // IF NOT SEND USING LOCAL HARDHAT NODE:
         if (localDeployerMnemonic) {
-            let deployerWallet = new ethers.Wallet.fromMnemonic(localDeployerMnemonic)
+            let deployerWallet: any = new ethers.Wallet.fromMnemonic(localDeployerMnemonic)
             deployerWallet = deployerWallet.connect(ethers.provider)
             console.log('💵 Sending ' + amount + ' ETH to ' + randomWallet.address + ' using deployer account')
             const sendresult = await deployerWallet.sendTransaction(tx)
@@ -399,11 +403,9 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
     })
 
 task('generate', 'Create a mnemonic for builder deploys', async (_, { ethers }) => {
-    const bip39 = require('bip39')
-    const hdkey = require('ethereumjs-wallet/hdkey')
-    const mnemonic = bip39.generateMnemonic()
+    const mnemonic = generateMnemonic()
     if (DEBUG) console.log('mnemonic', mnemonic)
-    const seed = await bip39.mnemonicToSeed(mnemonic)
+    const seed = await mnemonicToSeed(mnemonic)
     if (DEBUG) console.log('seed', seed)
     const hdwallet = hdkey.fromMasterSeed(seed)
     const wallet_hdpath = "m/44'/60'/0'/0/"
@@ -411,10 +413,10 @@ task('generate', 'Create a mnemonic for builder deploys', async (_, { ethers }) 
     const fullPath = wallet_hdpath + account_index
     if (DEBUG) console.log('fullPath', fullPath)
     const wallet = hdwallet.derivePath(fullPath).getWallet()
-    const privateKey = '0x' + wallet._privKey.toString('hex')
+    const privateKey = '0x' + wallet.getPrivateKey().toString('hex')
     if (DEBUG) console.log('privateKey', privateKey)
     const EthUtil = require('ethereumjs-util')
-    const address = '0x' + EthUtil.privateToAddress(wallet._privKey).toString('hex')
+    const address = '0x' + EthUtil.privateToAddress(wallet.getPrivateKey()).toString('hex')
     console.log('🔐 Account Generated as ' + address + ' and set as mnemonic in packages/hardhat')
     console.log("💬 Use 'yarn run account' to get more information about the deployment account.")
 
@@ -428,14 +430,11 @@ task('mineContractAddress', 'Looks for a deployer account that will give leading
         let contract_address = ''
         let address
 
-        const bip39 = require('bip39')
-        const hdkey = require('ethereumjs-wallet/hdkey')
-
         let mnemonic = ''
         while (contract_address.indexOf(taskArgs.searchFor) != 0) {
-            mnemonic = bip39.generateMnemonic()
+            mnemonic = generateMnemonic()
             if (DEBUG) console.log('mnemonic', mnemonic)
-            const seed = await bip39.mnemonicToSeed(mnemonic)
+            const seed = await mnemonicToSeed(mnemonic)
             if (DEBUG) console.log('seed', seed)
             const hdwallet = hdkey.fromMasterSeed(seed)
             const wallet_hdpath = "m/44'/60'/0'/0/"
@@ -443,10 +442,10 @@ task('mineContractAddress', 'Looks for a deployer account that will give leading
             const fullPath = wallet_hdpath + account_index
             if (DEBUG) console.log('fullPath', fullPath)
             const wallet = hdwallet.derivePath(fullPath).getWallet()
-            const privateKey = '0x' + wallet._privKey.toString('hex')
+            const privateKey = '0x' + wallet.getPrivateKey().toString('hex')
             if (DEBUG) console.log('privateKey', privateKey)
             const EthUtil = require('ethereumjs-util')
-            address = '0x' + EthUtil.privateToAddress(wallet._privKey).toString('hex')
+            address = '0x' + EthUtil.privateToAddress(wallet.getPrivateKey()).toString('hex')
 
             const rlp = require('rlp')
             const keccak = require('keccak')
@@ -471,12 +470,10 @@ task('mineContractAddress', 'Looks for a deployer account that will give leading
     })
 
 task('account', 'Get balance informations for the deployment account.', async (_, { ethers }) => {
-    const hdkey = require('ethereumjs-wallet/hdkey')
-    const bip39 = require('bip39')
     try {
         const mnemonic = fs.readFileSync('./mnemonic.txt').toString().trim()
         if (DEBUG) console.log('mnemonic', mnemonic)
-        const seed = await bip39.mnemonicToSeed(mnemonic)
+        const seed = await mnemonicToSeed(mnemonic)
         if (DEBUG) console.log('seed', seed)
         const hdwallet = hdkey.fromMasterSeed(seed)
         const wallet_hdpath = "m/44'/60'/0'/0/"
@@ -484,10 +481,10 @@ task('account', 'Get balance informations for the deployment account.', async (_
         const fullPath = wallet_hdpath + account_index
         if (DEBUG) console.log('fullPath', fullPath)
         const wallet = hdwallet.derivePath(fullPath).getWallet()
-        const privateKey = '0x' + wallet._privKey.toString('hex')
+        const privateKey = '0x' + wallet.getPrivateKey().toString('hex')
         if (DEBUG) console.log('privateKey', privateKey)
         const EthUtil = require('ethereumjs-util')
-        const address = '0x' + EthUtil.privateToAddress(wallet._privKey).toString('hex')
+        const address = '0x' + EthUtil.privateToAddress(wallet.getPrivateKey()).toString('hex')
 
         const qrcode = require('qrcode-terminal')
         qrcode.generate(address)
@@ -512,11 +509,11 @@ task('account', 'Get balance informations for the deployment account.', async (_
     }
 })
 
-async function addr(ethers, addr) {
+async function addr(ethers: typeof import('ethers/lib/ethers') & HardhatEthersHelpers, addr: any) {
     if (isAddress(addr)) {
         return getAddress(addr)
     }
-    const accounts = await ethers.provider.listAccounts()
+    const accounts: string[] = await ethers.provider.listAccounts()
     if (accounts[addr] !== undefined) {
         return accounts[addr]
     }
@@ -540,8 +537,8 @@ task('balance', "Prints an account's balance")
         console.log(formatUnits(balance, 'ether'), 'ETH')
     })
 
-function send(signer, txparams) {
-    return signer.sendTransaction(txparams, (error, transactionHash) => {
+function send(signer: any, txparams: any) {
+    return signer.sendTransaction(txparams, (error: any, transactionHash: any) => {
         if (error) {
             debug(`Error: ${error}`)
         }
@@ -561,7 +558,7 @@ task('send', 'Send ETH')
     .setAction(async (taskArgs, { network, ethers }) => {
         const from = await addr(ethers, taskArgs.from)
         debug(`Normalized from address: ${from}`)
-        const fromSigner = await ethers.provider.getSigner(from)
+        const fromSigner: JsonRpcSigner = await ethers.provider.getSigner(from)
 
         let to
         if (taskArgs.to) {
@@ -569,7 +566,7 @@ task('send', 'Send ETH')
             debug(`Normalized to address: ${to}`)
         }
 
-        const txRequest = {
+        const txRequest: any = {
             from: await fromSigner.getAddress(),
             to,
             value: parseUnits(taskArgs.amount ? taskArgs.amount : '0', 'ether').toHexString(),
@@ -588,3 +585,5 @@ task('send', 'Send ETH')
 
         return send(fromSigner, txRequest)
     })
+
+export default hardhatConfig
