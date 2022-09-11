@@ -71,7 +71,6 @@ contract NCSubscription is Ownable {
         principalBalance = principalBalance - poolSize;
         IAaveLendingPool lendingPool = aaveLendingPoolAddressesProvider.getLendingPool();
         lendingPool.withdraw(address(underlyingToken), poolSize, msg.sender);
-        token.transfer(msg.sender, poolSize);
         totalSubscriptions = totalSubscriptions.sub(1);
     }
 
