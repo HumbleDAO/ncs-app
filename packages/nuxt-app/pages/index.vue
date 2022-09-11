@@ -51,7 +51,7 @@ const colorMode = useColorMode()
 
 const { loadContracts } = useContractsStore()
 
-const { connect, isConnected } = useConnect({
+const { connect } = useConnect({
     connector: new InjectedConnector(),
 })
 
@@ -93,7 +93,10 @@ useNetworkDetailsStore().$patch((state: INetworkDetails) => {
 
 const contractsAddresses = computed(async () => {
     const loadedContracts = await loadContracts()
-    Object.keys(loadedContracts.value).map((key) => ({
+
+    if (!loadedContracts) return []
+
+    return Object.keys(loadedContracts.value).map((key) => ({
         name: key,
         address: loadedContracts.value[key].address,
     }))

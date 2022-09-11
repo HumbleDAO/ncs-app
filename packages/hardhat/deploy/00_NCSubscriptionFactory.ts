@@ -1,6 +1,6 @@
 // deploy/00_NC_Subscription_Factory.ts
 
-const { ethers, upgrades } = require('hardhat')
+// import { ethers, upgrades } from 'hardhat'
 
 const localChainId = '31337'
 

@@ -10,12 +10,11 @@ import fs from 'fs'
 import chalk from 'chalk'
 
 // import '@tenderly/hardhat-tenderly'
-import 'hardhat-abi-exporter'
+import '@nomicfoundation/hardhat-toolbox'
+import '@nomicfoundation/hardhat-chai-matchers'
 import '@nomiclabs/hardhat-ethers'
 import '@openzeppelin/hardhat-upgrades'
-import '@nomiclabs/hardhat-etherscan'
-import '@nomicfoundation/hardhat-chai-matchers'
-import '@nomicfoundation/hardhat-toolbox'
+import 'hardhat-abi-exporter'
 import 'hardhat-deploy'
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils
@@ -133,7 +132,8 @@ const hardhatConfig: HardhatUserConfig = {
         //     },
         // },
         mumbai: {
-            url: 'https://polygon-mumbai.g.alchemy.com/v2/67FteGLZqwk9wf3Q4haD3BWJhHFF4cKF',
+            // url: 'https://polygon-mumbai.g.alchemy.com/v2/67FteGLZqwk9wf3Q4haD3BWJhHFF4cKF',
+            url: process.env.MUMBAI_ALCHEMY_HTTPS ?? '',
             // url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/polygon/mumbai", // <---- YOUR MORALIS ID! (not limited to infura)
             accounts: [process.env.MUMBAI_DEPLOYER_PRIV_KEY ?? ''],
         },

@@ -42,7 +42,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             supportedChainsMetadata: SUPPORTED_CHAINS_METADATA,
-            alchemy: SUPPORTED_CHAINS_METADATA[process.env.CHAIN_ID],
+            alchemy: SUPPORTED_CHAINS_METADATA[process.env.CHAIN_ID ?? 31337],
         },
     },
 
