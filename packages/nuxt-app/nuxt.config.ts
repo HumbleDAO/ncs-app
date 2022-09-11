@@ -5,6 +5,9 @@ const SUPPORTED_CHAINS_METADATA = {
     31337: {
         network: 'Hardhat',
         chainId: 31337,
+        apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
+        https: process.env.MUMBAI_ALCHEMY_HTTPS,
+        websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
     },
     80001: {
         network: 'Mumbai',
@@ -51,7 +54,7 @@ export default defineNuxtConfig({
     target: 'static',
 
     vite: {
-        plugins: [eslintPlugin()],
+        // plugins: [eslintPlugin()],
     },
 })
 
