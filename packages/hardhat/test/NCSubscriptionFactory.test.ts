@@ -39,6 +39,7 @@ describe('NCSubscriptionsFactory', function () {
             let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
 
@@ -54,8 +55,10 @@ describe('NCSubscriptionsFactory', function () {
             let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
+
             // console.log('res', res)
             let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
             // console.log('subs created', subscriptionsCreatedAfter)
@@ -72,8 +75,10 @@ describe('NCSubscriptionsFactory', function () {
             let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
+
             console.log('res', res)
             let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
             // console.log('subs created', subscriptionsCreatedAfter)
@@ -81,7 +86,7 @@ describe('NCSubscriptionsFactory', function () {
 
             let subscription = await ncSubscription.attach(subscriptionsCreatedAfter[0])
             console.log('Subscription', subscription)
-            let subscribing = await subscription.subscribe({ value: 1000000 })
+            // let subscribing = await subscription.subscribe({ value: 1000000 })
         })
 
         // it('Should set the right owner', async function () {
