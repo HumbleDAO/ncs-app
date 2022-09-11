@@ -21,12 +21,16 @@
             <br />
             <div v-if="chain">Connected to {{ chain.name }}</div>
             <br />
-            <div v-if="contractsAddresses && contractsAddresses.length">
-                <div v-for="contract in contractsAddresses" :key="contract.name" class="flex flex-col">
-                    <label for="contract-name">
+            <div v-if="contractsAddresses">
+                <div
+                    v-for="contract in contractsAddresses"
+                    :key="contract.name + contract.address"
+                    class="flex flex-col"
+                >
+                    <div for="contract-address">{{ contract.address }}</div>
+                    <div for="name" class="heading">
                         {{ contract.name }}
-                    </label>
-                    <label for="contract-address">{{ contract.address }}</label>
+                    </div>
                 </div>
             </div>
             <br />
@@ -48,11 +52,27 @@ import { InjectedConnector } from 'vagmi/connectors/injected'
 import { INetworkDetails } from '@/composables/useNetworkDetailsStore'
 
 const colorMode = useColorMode()
+const nuxtApp = useNuxtApp()
+console.log('NUXT_APP: ', nuxtApp)
 
 const { loadContracts } = useContractsStore()
 
+const { data: contracts } = useAsyncData('contracts', async () => await loadContracts())
+
 const { connect } = useConnect({
     connector: new InjectedConnector(),
+    onError: (error) => {
+        console.log('ERROR CONNECTING: ', error)
+    },
+    onConnect: async (data) => {
+        console.log('CONNECTED: ', data)
+        await loadContracts()
+        useAccountStore().$patch({ address: data.account })
+        useNetworkDetailsStore().$patch({
+            selectedChainId: data.chain.id,
+            network: data.network,
+        })
+    },
 })
 
 const { disconnect } = useDisconnect()
@@ -60,19 +80,17 @@ const { disconnect } = useDisconnect()
 const { address } = useAccount()
 
 const { data: ensName } = useEnsName({
-    address: computed(() => address ?? address),
+    address: address,
 })
 
 const { data } = useBalance({
     addressOrName: computed(() => address),
 })
 
-const { chain } = useNetwork()
-const { chains, error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
+const { chain, chains } = useNetwork()
+const { error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
     chainId: 80001,
-    onSuccess: async (data) => {
-        // const loadedContracts = await loadContracts()
-        // console.log('LOADED_CONTRACTS_ON_CURRENT_CHAIN: \n', loadedContracts.value.NCSubscriptionFactory.address)
+    onSuccess: async (data: { id: number; network: string }) => {
         await loadContracts()
         useNetworkDetailsStore().$patch((state: INetworkDetails) => {
             state.selectedChainId = data.id
@@ -81,24 +99,12 @@ const { chains, error, isLoading, pendingChainId, switchNetwork } = useSwitchNet
     },
 })
 
-useNetworkDetailsStore().$patch((state: INetworkDetails) => {
-    state.network = chain.value?.name
-    state.selectedChainId = chain.value?.id
-    state.availableChains = chains.value
-})
+const contractsAddresses = computed(() => {
+    if (!contracts.value) return []
 
-// console.log('INIT_LOADED CONTRACTS', loadedContracts)
-// const { NCSubscriptionFactory } = loadedContracts.value
-// console.log('NCSubscriptionFactory', NCSubscriptionFactory.address)
-
-const contractsAddresses = computed(async () => {
-    const loadedContracts = await loadContracts()
-
-    if (!loadedContracts) return []
-
-    return Object.keys(loadedContracts.value).map((key) => ({
+    return Object.keys(contracts.value).map((key: string) => ({
         name: key,
-        address: loadedContracts.value[key].address,
+        address: contracts.value[key].address,
     }))
 })
 </script>

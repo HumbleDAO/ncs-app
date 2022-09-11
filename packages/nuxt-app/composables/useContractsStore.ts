@@ -12,8 +12,7 @@ export const useContractsStore = defineStore('contracts', () => {
     const { isChainSupported } = useSupportedChainsStore()
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
-    const _contracts = reactive({} as any)
-    const contracts = reactive({} as any)
+    const contracts = ref({} as any)
 
     async function loadContracts() {
         if (!isChainSupported(chain.value?.id)) {
@@ -69,19 +68,11 @@ export const useContractsStore = defineStore('contracts', () => {
             }
         )
 
-        _contracts.value = target
-
-        return _contracts
+        contracts.value = target
+        return contracts.value
     }
 
-    watch(
-        () => _contracts.value,
-        (newContracts) => {
-            contracts.value = newContracts
-        }
-    )
-
-    return { loadContracts, contracts: contracts.value }
+    return { loadContracts, contracts: computed(() => contracts.value) }
 })
 
 export interface IContract {
