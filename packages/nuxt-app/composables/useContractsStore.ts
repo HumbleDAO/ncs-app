@@ -7,7 +7,7 @@ import { loadAppContracts } from '@/helpers/loadAppContracts'
 
 import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStore'
 
-export const useContractsStore = defineStore('contracts', () => {
+export const useContractsStore = defineStore('contractsStore', () => {
     const { chain } = useNetwork()
     const { isChainSupported } = useSupportedChainsStore()
     const runtimeConfig = useRuntimeConfig()

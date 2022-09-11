@@ -1,58 +1,84 @@
-import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { expect } from 'chai'
 import { ethers, upgrades } from 'hardhat'
 
-// test NCSubscriptionsFactory as a proxy and upgradeable contract that uses openzeppelin
+import {
+    NCSubscriptionFactory as INCSubscriptionFactory,
+    NCSubscription as INCSubscription,
+} from '../typechain-types/contracts'
 
-describe('NCSubscriptionsFactory', function () {
-    let ncSubscriptionsFactory: any
-    let ncSubscription: any
-    let owner: any
-    let otherAccount: any
+import {
+    NCSubscriptionFactory__factory as INCSubscriptionFactory__factory,
+    NCSubscription__factory as INCSubscription__factory,
+} from '../typechain-types/factories/contracts'
 
-    this.beforeEach(async () => {
-        ;[owner, otherAccount] = await ethers.getSigners()
-        ncSubscriptionsFactory = await (await ethers.getContractFactory('NCSubscriptionFactory')).deploy()
-        ncSubscription = await ethers.getContractFactory('NCSubscription')
-    })
+// test NCSubscriptionFactory as a proxy and upgradeable contract that uses openzeppelin
+
+describe('NCSubscriptionFactory', function () {
+    async function deployNCSubscriptionFixture() {
+        const [owner, otherAccount] = await ethers.getSigners()
+
+        let NCSubscriptionFactory__factory: INCSubscriptionFactory__factory = await ethers.getContractFactory(
+            'NCSubscriptionFactory'
+        )
+
+        let NCSubscriptionFactory: INCSubscriptionFactory = await NCSubscriptionFactory__factory.deploy()
+
+        await NCSubscriptionFactory.deployed()
+
+        let NCSubscription__factory: INCSubscription__factory = await ethers.getContractFactory('NCSubscription')
+
+        return {
+            owner,
+            otherAccount,
+            NCSubscriptionFactory__factory,
+            NCSubscriptionFactory,
+            NCSubscription__factory,
+        }
+    }
 
     describe('createNCSubscription', function () {
+        let NCSubscriptionFactory: INCSubscriptionFactory
+        let owner: SignerWithAddress
+        let otherAccount: SignerWithAddress
+
+        beforeEach(async () => {
+            const {
+                NCSubscriptionFactory: _NCSubscriptionFactory,
+                owner: _owner,
+                otherAccount: _otherAccount,
+            } = await loadFixture(deployNCSubscriptionFixture)
+
+            NCSubscriptionFactory = _NCSubscriptionFactory
+            owner = _owner
+            otherAccount = _otherAccount
+        })
+
         it('should be deployed', async function () {
-            const [deployer] = await ethers.getSigners()
-            const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
-            const ncSubscription = await ethers.getContractFactory('NCSubscription')
-
-            const instance = await NCSubscriptionFactory.deploy()
-
-            // TODO: uncomment when everything is upgrade safe
-            // const instance = await upgrades.deployProxy(NCSubscriptionFactory)
-            // await instance.deployed()
-            // console.log('Deploy NCSubscriptionFactory Proxy Done ', instance.address)
-
-            expect(instance.address).to.be.properAddress
+            expect(NCSubscriptionFactory.address).to.be.properAddress
         })
 
         it('Should create a new subscription', async function () {
-            let beforeValue = await ncSubscriptionsFactory.totalSubscriptions()
+            let beforeValue = await NCSubscriptionFactory.totalSubscriptions()
             // console.log('Before', beforeValue)
-            let res = await ncSubscriptionsFactory.createNCSubscription(
+            let res = await NCSubscriptionFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
 
-            let afterValue = await ncSubscriptionsFactory.totalSubscriptions()
+            let afterValue = await NCSubscriptionFactory.totalSubscriptions()
             // console.log('After', afterValue)
             expect(beforeValue).to.not.equal(afterValue)
         })
 
         it('Should allow to get list of subscriptions created', async function () {
-            let subscriptionsCreatedBefore = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            let subscriptionsCreatedBefore = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(owner.address)
             console.log('subs created', subscriptionsCreatedBefore)
 
-            let res = await ncSubscriptionsFactory.createNCSubscription(
+            let res = await NCSubscriptionFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
@@ -60,7 +86,7 @@ describe('NCSubscriptionsFactory', function () {
             )
 
             // console.log('res', res)
-            let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            let subscriptionsCreatedAfter = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(owner.address)
             // console.log('subs created', subscriptionsCreatedAfter)
             expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
 
@@ -69,10 +95,10 @@ describe('NCSubscriptionsFactory', function () {
         })
 
         it('Should allow to subscribe to a subscription', async function () {
-            let subscriptionsCreatedBefore = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            let subscriptionsCreatedBefore = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(owner.address)
             console.log('subs created', subscriptionsCreatedBefore)
 
-            let res = await ncSubscriptionsFactory.createNCSubscription(
+            let res = await NCSubscriptionFactory.createNCSubscription(
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
@@ -80,7 +106,7 @@ describe('NCSubscriptionsFactory', function () {
             )
 
             console.log('res', res)
-            let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            let subscriptionsCreatedAfter = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(owner.address)
             // console.log('subs created', subscriptionsCreatedAfter)
             expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
 
