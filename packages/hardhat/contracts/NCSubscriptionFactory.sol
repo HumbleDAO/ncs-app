@@ -8,6 +8,8 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import './IAaveLendingPoolAddressesProvider.sol';
+
 import 'hardhat/console.sol';
 import './NCSubscription.sol';
 
@@ -32,9 +34,18 @@ contract NCSubscriptionFactory is Ownable {
     function createNCSubscription(
         string memory _eventName,
         uint256 _poolSizeInUSDC,
-        address tokenAddress
+        address tokenAddress,
+        address aTokenAddress,
+        IAaveLendingPoolAddressesProvider _aaveLendingPoolAddressesProvider
     ) external returns (address) {
-        NCSubscription _newNCSubscription = new NCSubscription(_eventName, _poolSizeInUSDC, tokenAddress, msg.sender);
+        NCSubscription _newNCSubscription = new NCSubscription(
+            _eventName,
+            _poolSizeInUSDC,
+            tokenAddress,
+            aTokenAddress,
+            msg.sender,
+            _aaveLendingPoolAddressesProvider
+        );
         subscriptions.push(_newNCSubscription);
         totalSubscriptions = totalSubscriptions.add(1);
         ownerNCSubscriptions[msg.sender].push(address(_newNCSubscription));

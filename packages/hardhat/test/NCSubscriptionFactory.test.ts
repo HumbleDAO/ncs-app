@@ -21,6 +21,8 @@ describe('NCSubscriptionsFactory', function () {
         it('should be deployed', async function () {
             const [deployer] = await ethers.getSigners()
             const NCSubscriptionFactory = await ethers.getContractFactory('NCSubscriptionFactory')
+            const ncSubscription = await ethers.getContractFactory('NCSubscription')
+
             const instance = await NCSubscriptionFactory.deploy()
 
             // TODO: uncomment when everything is upgrade safe
@@ -37,11 +39,10 @@ describe('NCSubscriptionsFactory', function () {
             let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
-            // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
-            // console.log('Subscription', subscription)
-            // console.log('res', res)
+
             let afterValue = await ncSubscriptionsFactory.totalSubscriptions()
             // console.log('After', afterValue)
             expect(beforeValue).to.not.equal(afterValue)
@@ -54,8 +55,10 @@ describe('NCSubscriptionsFactory', function () {
             let res = await ncSubscriptionsFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
+
             // console.log('res', res)
             let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
             // console.log('subs created', subscriptionsCreatedAfter)
@@ -63,6 +66,27 @@ describe('NCSubscriptionsFactory', function () {
 
             // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
             // console.log('Subscription', subscription)
+        })
+
+        it('Should allow to subscribe to a subscription', async function () {
+            let subscriptionsCreatedBefore = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            console.log('subs created', subscriptionsCreatedBefore)
+
+            let res = await ncSubscriptionsFactory.createNCSubscription(
+                'New Event',
+                '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
+            )
+
+            console.log('res', res)
+            let subscriptionsCreatedAfter = await ncSubscriptionsFactory.getSubscriptionsCreatedByOwner(owner.address)
+            // console.log('subs created', subscriptionsCreatedAfter)
+            expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
+
+            let subscription = await ncSubscription.attach(subscriptionsCreatedAfter[0])
+            console.log('Subscription', subscription)
+            // let subscribing = await subscription.subscribe({ value: 1000000 })
         })
 
         // it('Should set the right owner', async function () {
