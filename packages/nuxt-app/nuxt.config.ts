@@ -54,7 +54,7 @@ export default defineNuxtConfig({
     target: 'static',
 
     vite: {
-        // plugins: [eslintPlugin()],
+        plugins: [eslintPlugin()],
     },
 })
 

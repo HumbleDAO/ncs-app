@@ -390,7 +390,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
         // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
         // IF NOT SEND USING LOCAL HARDHAT NODE:
         if (localDeployerMnemonic) {
-            let deployerWallet: any = new ethers.Wallet.fromMnemonic(localDeployerMnemonic)
+            let deployerWallet = ethers.Wallet.fromMnemonic(localDeployerMnemonic.toLocaleString())
             deployerWallet = deployerWallet.connect(ethers.provider)
             console.log('💵 Sending ' + amount + ' ETH to ' + randomWallet.address + ' using deployer account')
             const sendresult = await deployerWallet.sendTransaction(tx)
