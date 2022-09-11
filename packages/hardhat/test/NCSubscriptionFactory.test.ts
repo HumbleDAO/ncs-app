@@ -24,7 +24,6 @@ describe('NCSubscriptionFactory', function () {
         )
 
         let NCSubscriptionFactory: INCSubscriptionFactory = await NCSubscriptionFactory__factory.deploy()
-
         await NCSubscriptionFactory.deployed()
 
         let NCSubscription__factory: INCSubscription__factory = await ethers.getContractFactory('NCSubscription')
@@ -40,17 +39,20 @@ describe('NCSubscriptionFactory', function () {
 
     describe('createNCSubscription', function () {
         let NCSubscriptionFactory: INCSubscriptionFactory
+        let NCSubscription__factory: INCSubscription__factory
         let owner: SignerWithAddress
         let otherAccount: SignerWithAddress
 
         beforeEach(async () => {
             const {
                 NCSubscriptionFactory: _NCSubscriptionFactory,
+                NCSubscription__factory: _NCSubscription__factory,
                 owner: _owner,
                 otherAccount: _otherAccount,
             } = await loadFixture(deployNCSubscriptionFixture)
 
             NCSubscriptionFactory = _NCSubscriptionFactory
+            NCSubscription__factory = _NCSubscription__factory
             owner = _owner
             otherAccount = _otherAccount
         })
@@ -90,7 +92,7 @@ describe('NCSubscriptionFactory', function () {
             // console.log('subs created', subscriptionsCreatedAfter)
             expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
 
-            // let subscription = await NCSubscription.at(res.logs[0].args.subscription)
+            // let subscription = await NCSubscription__factory.at(res.logs[0].args.subscription)
             // console.log('Subscription', subscription)
         })
 
@@ -110,7 +112,7 @@ describe('NCSubscriptionFactory', function () {
             // console.log('subs created', subscriptionsCreatedAfter)
             expect(subscriptionsCreatedBefore).to.not.equal(subscriptionsCreatedAfter)
 
-            let subscription = await ncSubscription.attach(subscriptionsCreatedAfter[0])
+            let subscription = await NCSubscription__factory.attach(subscriptionsCreatedAfter[0])
             console.log('Subscription', subscription)
             // let subscribing = await subscription.subscribe({ value: 1000000 })
         })
