@@ -52,7 +52,7 @@ contract NCSubscription is Ownable {
 
     function unsubscribe() external {
         // todo: require allowance of transfer
-        require(nft.isApprovedForAll(msg.sender, address(this)), 'Subscriptions are not approved for closing');
+        require(nft.isApprovedForAll(msg.sender, address(this), 'Subscriptions are not approved for closing');
         require(nft.balanceOf(msg.sender) >= 0, 'No Subscription');
         nft.transferFrom(address(this), msg.sender, subscriptionsMap[msg.sender]);
         token.transferFrom(address(this), msg.sender, poolSize);
