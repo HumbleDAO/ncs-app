@@ -6,8 +6,8 @@
             <br />
 
             <label for="main-drawer" class="btn btn-primary drawer-button rounded-none">Open drawer</label>
-            <button class="btn btn-primary rounded-none" @click="connect">Connect</button>
-            <button class="btn btn-primary rounded-none" @click="disconnect">Disconnect</button>
+            <button class="btn btn-primary rounded-none" @click="connect()">Connect</button>
+            <button class="btn btn-primary rounded-none" @click="disconnect()">Disconnect</button>
 
             <br />
             <br />
