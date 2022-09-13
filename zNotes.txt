@@ -1,0 +1,17 @@
+  if (network === 'development' || network === 'matictestnet' || network === 'matictestnet2') {
+    // token setup for local dev
+    // await token.transferFrom(token.address, accounts[0], web3.utils.toWei('1', 'kether'))
+    aaveUsdcPoolAddressesProviderAddress = '0x178113104fEcbcD7fF8669a0150721e231F0FD4B'
+    aUsdcTokenAddress = '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9'
+    usdcTokenAddress = '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e'
+    swapRouterAddress = '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506'
+    aaveIncentivesControllerAddress = '0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644'
+    minAmountToClaim = '10000000'
+  } else if (network === 'maticmainnet') {
+    aaveUsdcPoolAddressesProviderAddress = '0xd05e3E715d945B59290df0ae8eF85c1BdB684744'
+    aUsdcTokenAddress = '0x1a13F4Ca1d028320A707D99520AbFefca3998b7F'
+    usdcTokenAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+    swapRouterAddress = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
+    aaveIncentivesControllerAddress = '0x357D51124f59836DeD84c8a1730D72B749d8BC23'
+    minAmountToClaim = '100000000000'
+  }
