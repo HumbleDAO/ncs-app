@@ -1,16 +1,20 @@
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { expect } from 'chai'
+import { smock } from '@defi-wonderland/smock'
 import { ethers, upgrades } from 'hardhat'
 
 import {
     NCSubscriptionFactory as INCSubscriptionFactory,
     NCSubscription as INCSubscription,
-} from '../typechain-types/contracts'
+    IAaveLendingPoolAddressesProvider,
+} from '../typechain-types'
 
 import {
     NCSubscriptionFactory__factory as INCSubscriptionFactory__factory,
     NCSubscription__factory as INCSubscription__factory,
+    IAaveLendingPoolAddressesProvider__factory,
+    IAaveLendingPool__factory,
 } from '../typechain-types/factories/contracts'
 
 // test NCSubscriptionFactory as a proxy and upgradeable contract that uses openzeppelin
@@ -68,6 +72,7 @@ describe('NCSubscriptionFactory', function () {
                 'New Event',
                 '1000000',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
 
@@ -83,6 +88,7 @@ describe('NCSubscriptionFactory', function () {
             let res = await NCSubscriptionFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
@@ -103,6 +109,7 @@ describe('NCSubscriptionFactory', function () {
             let res = await NCSubscriptionFactory.createNCSubscription(
                 'New Event',
                 '1000000',
+                '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26',
                 '0xDE29485dF7e941866442ceb25DCe1b9c64D02A26'
             )
