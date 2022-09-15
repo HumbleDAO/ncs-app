@@ -1,5 +1,5 @@
 <template>
-    <div class="drawer">
+    <div class="drawer fixed">
         <input id="main-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content" :data-theme="colorMode.preference">
             <slot name="default" />
@@ -20,8 +20,8 @@
     </div>
 </template>
 
-<script setup>
-const colorMode = useColorMode('luxury')
+<script setup lang="ts">
+const colorMode = useColorMode()
 </script>
 
 <style lang="scss" scoped></style>
