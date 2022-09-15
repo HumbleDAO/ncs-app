@@ -17,6 +17,7 @@
         "nuxt-app:generate": "yarn workspace @ncs/nuxt-app generate",
         "nuxt-app:preview": "yarn workspace @ncs/nuxt-app preview",
         "nuxt-app:lint": "yarn workspace @ncs/nuxt-app lint",
+        "nuxt-app:clean": "yarn workspace @ncs/nuxt-app clean",
         "build": "yarn workspace @ncs/nuxt-app build --max-old-space-size=12288",
         "dev": "yarn workspace @ncs/nuxt-app dev",
         "prettier": "yarn workspace @ncs/nuxt-app prettier && yarn workspace @ncs/hardhat prettier",
