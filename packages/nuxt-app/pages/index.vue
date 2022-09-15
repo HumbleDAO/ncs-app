@@ -1,6 +1,6 @@
 <template>
     <div class="flex h-screen" :data-theme="colorMode.preference">
-        <hero>
+        <nc-hero class="flex flex-col justify-center items-center">
             <h1 class="text-5xl font-bold">My App Name</h1>
             <p class="py-6"></p>
             <br />
@@ -34,14 +34,18 @@
                 </div>
             </div>
             <br />
-            <button v-for="x in chains" :key="x.id" class="btn mx-1 rounded-none" @click="switchNetwork(x.id)">
+            <button v-for="x in chains" :key="x.id" class="btn my-5 rounded-none" @click="switchNetwork(x.id)">
                 {{ x.name }}
                 {{ isLoading && pendingChainId === x.id ? ' (switching)' : '' }}
             </button>
             <div v-if="error">
                 {{ error.message }}
             </div>
-        </hero>
+
+            <div class="my-5 flex-col">
+                <nc-subscription-card />
+            </div>
+        </nc-hero>
     </div>
 </template>
 
@@ -51,14 +55,16 @@ import { InjectedConnector } from 'vagmi/connectors/injected'
 
 import { INetworkDetails } from '@/composables/useNetworkDetailsStore'
 
+definePageMeta({
+    colorMode: 'luxury',
+})
+
 const colorMode = useColorMode()
-const nuxtApp = useNuxtApp()
-console.log('NUXT_APP: ', nuxtApp)
 
 const { loadContracts } = useContractsStore()
-
 const { data: contracts } = useAsyncData('contracts', async () => await loadContracts())
 
+const { disconnect } = useDisconnect()
 const { connect } = useConnect({
     connector: new InjectedConnector(),
     onError: (error) => {
@@ -75,16 +81,12 @@ const { connect } = useConnect({
     },
 })
 
-const { disconnect } = useDisconnect()
-
 const { address } = useAccount()
-
 const { data: ensName } = useEnsName({
     address: address,
 })
-
 const { data } = useBalance({
-    addressOrName: computed(() => address),
+    addressOrName: computed(() => address?.value),
 })
 
 const { chain, chains } = useNetwork()

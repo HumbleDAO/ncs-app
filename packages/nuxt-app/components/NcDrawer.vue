@@ -14,14 +14,14 @@
                     <li><a>Sidebar Item 2</a></li>
                 </ul>
 
-                <ThemeSelector />
+                <nc-theme-selector />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-const colorMode = useColorMode()
+const colorMode = useColorMode('luxury')
 </script>
 
 <style lang="scss" scoped></style>
