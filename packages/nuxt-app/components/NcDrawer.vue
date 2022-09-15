@@ -10,8 +10,7 @@
             <div class="overflow-y-auto w-80 bg-base-100 text-base-content flex flex-col">
                 <!-- Sidebar content here -->
                 <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content flex-col flex-1">
-                    <li><a>Sidebar Item 1</a></li>
-                    <li><a>Sidebar Item 2</a></li>
+                    <li><a>Dashboard</a></li>
                 </ul>
 
                 <nc-theme-selector />
