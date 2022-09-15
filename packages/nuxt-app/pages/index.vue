@@ -15,7 +15,7 @@
             </div>
 
             <div class="my-5 flex flex-col items-center">
-                <nc-subscription-card />
+                <nc-subscription-factory-card />
             </div>
         </nc-hero>
     </div>
