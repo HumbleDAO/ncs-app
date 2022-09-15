@@ -1,20 +1,36 @@
 import { defineNuxtConfig } from 'nuxt'
 import eslintPlugin from 'vite-plugin-eslint'
+import svgLoader from 'vite-svg-loader'
 
 const SUPPORTED_CHAINS_METADATA = {
     31337: {
-        network: 'Hardhat',
+        network: 'hardhat',
         chainId: 31337,
         apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
         https: process.env.MUMBAI_ALCHEMY_HTTPS,
         websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
+        aaveUsdcPoolAddressesProviderAddress: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B',
+        aUsdcTokenAddress: '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
+        usdcTokenAddress: '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
     },
     80001: {
-        network: 'Mumbai',
+        network: 'polygonMumbai',
         chainId: 80001,
         apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
         https: process.env.MUMBAI_ALCHEMY_HTTPS,
         websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
+        aaveUsdcPoolAddressesProviderAddress: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B',
+        aUsdcTokenAddress: '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
+        usdcTokenAddress: '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
+    },
+    137: {
+        network: 'polygon',
+        chainId: 137,
+        apiKey: process.env.POLYGON_ALCHEMY_API_KEY,
+        websocket: process.env.POLYGON_ALCHEMY_WEBSOCKET,
+        aaveUsdcPoolAddressesProviderAddress: '0xd05e3E715d945B59290df0ae8eF85c1BdB684744',
+        aUsdcTokenAddress: '0x1a13F4Ca1d028320A707D99520AbFefca3998b7F',
+        usdcTokenAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
     },
 }
 
@@ -42,6 +58,17 @@ export default defineNuxtConfig({
         ],
     ],
 
+    colorMode: {
+        preference: 'luxury', // default value of $colorMode.preference
+        fallback: 'dark', // fallback value if not system preference found
+        hid: 'nuxt-color-mode-script',
+        globalName: '__NUXT_COLOR_MODE__',
+        componentName: 'ColorScheme',
+        classPrefix: '',
+        classSuffix: '-mode',
+        storageKey: 'nuxt-color-mode',
+    },
+
     runtimeConfig: {
         public: {
             supportedChainsMetadata: SUPPORTED_CHAINS_METADATA,
@@ -54,7 +81,12 @@ export default defineNuxtConfig({
     target: 'static',
 
     vite: {
-        plugins: [eslintPlugin()],
+        plugins: [
+            svgLoader({
+                /* ... */
+            }),
+            eslintPlugin(),
+        ],
     },
 })
 

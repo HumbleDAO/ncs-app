@@ -1,8 +1,8 @@
 <template>
     <div class="h-screen" :data-theme="colorMode.preference">
-        <Drawer>
+        <nc-drawer>
             <slot />
-        </Drawer>
+        </nc-drawer>
     </div>
 </template>
 
