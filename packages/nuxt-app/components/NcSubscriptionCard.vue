@@ -1,5 +1,4 @@
 <template>
-    <reference types="vite-svg-loader" />
     <nc-card title="Create Subscription" description="">
         <template #icon>
             <div class="avatar self-center" name="icon">
@@ -43,10 +42,9 @@
 </template>
 
 <script setup lang="ts">
-import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
-
 import { erc20ABI, useNetwork, useAccount, useConnect } from 'vagmi'
 import { ethers, BigNumber, utils } from 'ethers'
+import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
 
 const { data: contracts } = await useAsyncData('contracts', async () => await useContractsStore().loadContracts())
 
