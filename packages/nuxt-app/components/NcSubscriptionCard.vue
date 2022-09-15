@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { erc20ABI, useNetwork, useAccount } from 'vagmi'
-import { ethers, BigNumber } from 'ethers'
+import { erc20ABI, useNetwork, useAccount, useSigner, useConnect } from 'vagmi'
+import { ethers, BigNumber, utils } from 'ethers'
 
 const { data: contracts } = await useAsyncData('contracts', async () => await useContractsStore().loadContracts())
 
@@ -38,48 +38,51 @@ const { data: contracts } = await useAsyncData('contracts', async () => await us
 const runtimeConfig = useRuntimeConfig()
 const { address, isConnected } = useAccount()
 const { chain } = useNetwork()
+const { activeConnector } = useConnect()
 
 // https://vuejs.org/guide/introduction.html#composition-api
 const eventName = ref('')
-const stakeAmount = ref(null)
+const stakeAmount = ref(0)
 const apy = ref(0)
-let aUsdcContract = ref<ethers.Contract>()
+const allowance = ref<BigNumber>(BigNumber.from(0))
+const allowanceInEthers = ref()
+
+let usdcContract = ref<ethers.Contract>()
 
 // https://vuejs.org/guide/essentials/lifecycle.html#registering-lifecycle-hooks
 onMounted(async () => {
     if (isConnected) {
-        aUsdcContract.value = new ethers.Contract(
-            runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.aUsdcTokenAddress,
+        const signer = await activeConnector.value.getSigner()
+        console.log('SIGNER: ', signer)
+        usdcContract.value = new ethers.Contract(
+            runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.usdcTokenAddress,
             erc20ABI,
-            ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
-                alchemy: runtimeConfig.alchemy.apiKey,
-            })
+            signer
         )
 
         const { NCSubscriptionFactory } = contracts.value
-        console.log('NCSubscriptionFactory: ', NCSubscriptionFactory)
-        const allowance = await aUsdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
-        console.log('allowance: ', allowance)
-        console.log('USDC_CONTRACT: ', aUsdcContract)
-        console.log('TOTAL_SUPPLY: ', BigNumber.from(await aUsdcContract.value.totalSupply()).toString())
+        allowance.value = await usdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
     }
 })
 
 const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
     const { NCSubscriptionFactory } = contracts.value
 
-    console.log('CHAIN_ID: ', chain.value.id)
-    console.log('USDC_CONTRACT: ', runtimeConfig.public.supportedChainsMetadata[chain.value.id].aUsdcTokenAddress)
-    console.log('ADDRESS_VALUE: ', address.value)
-    console.log('NCSubscriptionFactory: ', NCSubscriptionFactory.address)
-    const checkAllowance = await aUsdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
+    const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
 
-    // TODO: Implement allowance check and approval
-
-    if (BigNumber.isBigNumber(checkAllowance)) {
-        console.log('CHECK_ALLOWANCE', BigNumber.from(checkAllowance).toNumber())
+    if (BigNumber.isBigNumber(checkAllowance) && stakeAmount.value > 0) {
+        if (allowanceInEthers.value < stakeAmount.value) {
+            await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
+        }
     }
 }
+
+watch(
+    () => allowance.value,
+    (newAllowance) => {
+        allowanceInEthers.value = utils.formatEther(newAllowance)
+    }
+)
 </script>
 
 <style lang="scss" scoped></style>
