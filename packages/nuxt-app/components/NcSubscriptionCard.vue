@@ -12,14 +12,18 @@
         <template #default>
             <nc-input v-model="eventName" type="text" placeholder="service..." />
 
-            <label for="nc-input-stake-amount">Staked Amount Required to Subscribe</label>
-            <nc-input v-model="stakeAmount" type="number" placeholder="0..." />
+            <div class="flex flex-col my-2">
+                <label for="nc-input-stake-amount" class="text-sm self-start"
+                    >Staked Amount Required to Subscribe</label
+                >
+                <nc-input v-model="stakeAmount" type="number" placeholder="0..." />
+            </div>
 
             <div class="flex justify-between border-opacity-50">
                 <div class="w-2/4 flex flex-col justify-center">
-                    <label for="select-tokens">Select stake token</label>
+                    <label for="select-tokens" class="text-sm">Select stake token</label>
 
-                    <div class="flex self-center">
+                    <div class="flex self-center mt-2">
                         <usdcCoinSvg
                             class="w-8 h-8 cursor-pointer"
                             @click.prevent="checkAllowanceAndApproveNCSubscriptionFactory()"
