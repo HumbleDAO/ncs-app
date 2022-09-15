@@ -1,34 +1,46 @@
 <template>
     <reference types="vite-svg-loader" />
     <nc-card title="Create Subscription" description="">
-        <div>
-            <nc-input v-model="eventName" class="my-2" type="text" placeholder="service..." />
-
-            <label class="my-2" for="nc-input-stake-amount">Staked Amount Required to Subscribe</label>
-            <nc-input v-model="stakeAmount" class="my-2" type="number" placeholder="0..." />
-
-            <div class="flex my-2 justify-between">
-                <div class="w-3/4 flex flex-col justify-center">
-                    <label for="select-tokens">Select stake token</label>
-                    <!-- TODO: Implement token selection -->
-                    <button
-                        class="btn btn-circle btn-primary m-1 self-center"
-                        @click="checkAllowanceAndApproveNCSubscriptionFactory()"
-                    >
-                        USDC
-                    </button>
-                </div>
-                <div class="text-xl">&vert;</div>
-                <div class="w-auto">
-                    <label for="apy">{{ apy }} APY %</label>
-                    <!-- TODO: allow setting of APY from an action we dispatch (when interfacing with contract) -->
+        <template #icon>
+            <div class="avatar self-center" name="icon">
+                <div class="w-24 rounded">
+                    <img src="@/assets/handshake.png" />
                 </div>
             </div>
-        </div>
+        </template>
+
+        <template #default>
+            <nc-input v-model="eventName" type="text" placeholder="service..." />
+
+            <label for="nc-input-stake-amount">Staked Amount Required to Subscribe</label>
+            <nc-input v-model="stakeAmount" type="number" placeholder="0..." />
+
+            <div class="flex justify-between border-opacity-50">
+                <div class="w-2/4 flex flex-col justify-center">
+                    <label for="select-tokens">Select stake token</label>
+
+                    <div class="flex self-center">
+                        <usdcCoinSvg
+                            class="w-8 h-8 cursor-pointer"
+                            @click.prevent="checkAllowanceAndApproveNCSubscriptionFactory()"
+                        />
+                    </div>
+                </div>
+
+                <div class="divide-y-1a text-6xl h-full">&verbar;</div>
+
+                <div class="w-2/4 flex items-center justify-center">
+                    <!-- TODO: Ensure apy is fetched for -->
+                    <label for="apy">{{ apy }} APY %</label>
+                </div>
+            </div>
+        </template>
     </nc-card>
 </template>
 
 <script setup lang="ts">
+import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
+
 import { erc20ABI, useNetwork, useAccount, useConnect } from 'vagmi'
 import { ethers, BigNumber, utils } from 'ethers'
 
@@ -70,10 +82,8 @@ const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
 
     const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
 
-    if (BigNumber.isBigNumber(checkAllowance) && stakeAmount.value > 0) {
-        if (allowanceInEthers.value < stakeAmount.value) {
-            await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
-        }
+    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
+        await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
     }
 }
 

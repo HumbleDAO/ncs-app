@@ -2,9 +2,9 @@
     <div class="card w-96 bg-base-100 shadow-xl image-full">
         <!-- <figure><img src="https://placeimg.com/400/225/arch" alt="subsc" /></figure> -->
         <div class="card-body flex flex-col">
-            <h2 class="card-title">{{ props.title }}</h2>
+            <slot name="icon" class="self-center" />
 
-            <slot name="icon" />
+            <h2 class="card-title self-center">{{ props.title }}</h2>
 
             <p>{{ props.description }}</p>
 
