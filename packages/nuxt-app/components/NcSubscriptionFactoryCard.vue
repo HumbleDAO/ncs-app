@@ -67,7 +67,7 @@ onMounted(async () => {
         const signer = await activeConnector.value.getSigner()
         console.log('SIGNER: ', signer)
         usdcContract.value = new ethers.Contract(
-            runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.,
+            runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.usdcTokenAddress,
             erc20ABI,
             signer
         )
@@ -89,11 +89,7 @@ const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
 
 const checkAllowanceAndApproveSubscription = async (subAddress) => {
     const signer = await activeConnector.value.getSigner()
-    const subscription = new ethers.Contract(
-            subAddress,
-            NCSubscriptionABI,
-            signer
-        )
+    const subscription = new ethers.Contract(subAddress, NCSubscriptionABI, signer)
     const checkAllowance = await usdcContract.value.allowance(subAddress, address.value)
 
     if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
@@ -110,7 +106,13 @@ const createSubscription = async () => {
     if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
         await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
     }
-    NCSubscriptionFactory.createSubscription(eventName.value, utils.parseEther(String(stakeAmount.value)),"0x2058a9d7613eee744279e3856ef0eada5fcbaa7e", "0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9","0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644")
+    NCSubscriptionFactory.createSubscription(
+        eventName.value,
+        utils.parseEther(String(stakeAmount.value)),
+        '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
+        '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
+        '0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644'
+    )
 }
 
 const getSubscriptions = async () => {
@@ -129,24 +131,15 @@ const getSubscriptionsByUser = async (address) => {
 
 const subscribe = async (subAddress) => {
     const signer = await activeConnector.value.getSigner()
-    const subscription = new ethers.Contract(
-            subAddress,
-            NCSubscriptionABI,
-            signer
-        )
-        checkAllowanceAndApproveSubscription(subAddress)
-        subscription.subscribe()
-
+    const subscription = new ethers.Contract(subAddress, NCSubscriptionABI, signer)
+    checkAllowanceAndApproveSubscription(subAddress)
+    subscription.subscribe()
 }
 
 const unsubscribe = async (subAddress) => {
     const signer = await activeConnector.value.getSigner()
-    const subscription = new ethers.Contract(
-            subAddress,
-            NCSubscriptionABI,
-            signer
-        )
-        subscription.unsubscribe()
+    const subscription = new ethers.Contract(subAddress, NCSubscriptionABI, signer)
+    subscription.unsubscribe()
 }
 
 watch(
