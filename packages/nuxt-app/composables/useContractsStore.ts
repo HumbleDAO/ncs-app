@@ -9,16 +9,14 @@ import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStor
 
 export const useContractsStore = defineStore('contractsStore', () => {
     const { chain } = useNetwork()
-    const { isChainSupported } = useSupportedChainsStore()
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
     const contracts = ref({} as any)
 
+    const provider = ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
+        alchemy: runtimeConfig.alchemy.apiKey,
+    })
     async function loadContracts() {
-        if (!isChainSupported(chain.value?.id)) {
-            return console.log(`Chain ${chain.value?.id} is not supported`)
-        }
-
         const { deployedContracts } = await loadAppContracts()
         const preparedContracts = [] as any
         const deployedChains = []
@@ -43,9 +41,7 @@ export const useContractsStore = defineStore('contractsStore', () => {
                         instance: new ethers.Contract(
                             contractAddressAndAbi.address,
                             contractAddressAndAbi.abi,
-                            ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
-                                alchemy: runtimeConfig.alchemy.apiKey,
-                            })
+                            provider
                         ),
                     })
                 })
@@ -59,20 +55,20 @@ export const useContractsStore = defineStore('contractsStore', () => {
         const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
         const target = {}
 
+        const { chainId } = await provider.getNetwork()
         console.log('allContractsGroupedByChainId: ', allContractsGroupedByChainId)
-        console.log('chain.value?.id: ', chain.value?.id)
+        console.log('chain.value?.id: ', chainId)
 
-        allContractsGroupedByChainId[chain.value?.id ?? runtimeConfig.public.supportedChains[80001]].forEach(
-            ({ name, instance }) => {
-                target[name] = instance
-            }
-        )
+        allContractsGroupedByChainId[chainId].forEach(({ name, instance }) => {
+            target[name] = instance
+        })
 
         contracts.value = target
+
         return contracts.value
     }
 
-    return { loadContracts, contracts: computed(() => contracts.value) }
+    return { loadContracts, contracts: computed(() => contracts.value), provider }
 })
 
 export interface IContract {

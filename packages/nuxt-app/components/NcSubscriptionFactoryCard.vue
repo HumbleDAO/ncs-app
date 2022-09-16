@@ -46,8 +46,8 @@ import { erc20ABI, useNetwork, useAccount, useConnect } from 'vagmi'
 import { ethers, BigNumber, utils } from 'ethers'
 import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
 
-const { data: contracts } = await useAsyncData('contracts', async () => await useContractsStore().loadContracts())
-
+const { loadContracts } = useContractsStore()
+await loadContracts()
 // https://vuejs.org/guide/reusability/composables.html
 const runtimeConfig = useRuntimeConfig()
 const { address, isConnected } = useAccount()
@@ -65,7 +65,9 @@ let usdcContract = ref<ethers.Contract>()
 
 // https://vuejs.org/guide/essentials/lifecycle.html#registering-lifecycle-hooks
 onMounted(async () => {
-    if (isConnected) {
+    if (isConnected.value) {
+        const { contracts } = useContractsStore()
+
         const signer = await activeConnector.value.getSigner()
         console.log('SIGNER: ', signer)
         usdcContract.value = new ethers.Contract(
@@ -73,21 +75,12 @@ onMounted(async () => {
             erc20ABI,
             signer
         )
-
-        const { NCSubscriptionFactory } = contracts.value
+        console.log('ALL_CONTRACTS: ', contracts)
+        const { NCSubscriptionFactory } = contracts
+        console.log('NCSubscriptionFactory: ', NCSubscriptionFactory.address)
         allowance.value = await usdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
     }
 })
-
-const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
-    const { NCSubscriptionFactory } = contracts.value
-
-    const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
-
-    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
-        await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
-    }
-}
 
 watch(
     () => allowance.value,
@@ -95,6 +88,18 @@ watch(
         allowanceInEthers.value = utils.formatEther(newAllowance)
     }
 )
+
+const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
+    const { contracts } = useContractsStore()
+    console.log('CONTRACTS: ', contracts)
+    const { NCSubscriptionFactory } = contracts
+    console.log('NCSubscriptionFactory: ', NCSubscriptionFactory.address)
+    const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
+
+    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
+        await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
+    }
+}
 </script>
 
 <style lang="scss" scoped></style>

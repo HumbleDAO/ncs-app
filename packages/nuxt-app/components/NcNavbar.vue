@@ -66,11 +66,13 @@ import { INetworkDetails } from '@/composables/useNetworkDetailsStore'
 
 const emit = defineEmits(['toggleDrawer'])
 const { address } = useAccount()
-const { loadContracts } = useContractsStore()
 const { chain, chains } = useNetwork()
+
 const { error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
     chainId: 80001,
     onSuccess: async (data: { id: number; network: string }) => {
+        const { loadContracts } = useContractsStore()
+
         await loadContracts()
         useNetworkDetailsStore().$patch((state: INetworkDetails) => {
             state.selectedChainId = data.id
@@ -86,7 +88,10 @@ const { connect, isConnected } = useConnect({
     },
     onConnect: async (data) => {
         console.log('CONNECTED: ', data)
+        const { loadContracts, contracts } = useContractsStore()
+
         await loadContracts()
+        console.log('LOADED_CONTRACTS: ', contracts)
         useAccountStore().$patch({ address: data.account })
         useNetworkDetailsStore().$patch({
             selectedChainId: data.chain.id,
