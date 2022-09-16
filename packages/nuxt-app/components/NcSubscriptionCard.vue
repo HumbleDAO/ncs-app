@@ -1,9 +1,9 @@
 <template>
-    <nc-card title="Create Subscription" description="">
+    <nc-card title="Create Subscription" :description="props.description">
         <template #icon>
             <div class="avatar self-center" name="icon">
                 <div class="w-24 rounded">
-                    <img src="@/assets/handshake.png" />
+                    <img src="@/assets/chartsoncomputer.png" />
                 </div>
             </div>
         </template>
@@ -12,9 +12,9 @@
             <nc-input v-model="eventName" type="text" placeholder="service..." />
 
             <div class="flex flex-col my-2">
-                <label for="nc-input-stake-amount" class="text-sm self-start"
-                    >Staked Amount Required to Subscribe</label
-                >
+                <label for="nc-input-stake-amount" class="text-sm self-start">
+                    Staked Amount Required to Subscribe
+                </label>
                 <nc-input v-model="stakeAmount" type="number" placeholder="0..." />
             </div>
 
@@ -48,6 +48,21 @@ import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
 const runtimeConfig = useRuntimeConfig()
 const { address } = useAccount()
 const { activeConnector, isConnected } = useConnect()
+
+const props = defineProps({
+    description: {
+        type: String,
+        required: true,
+    },
+    stakedAmount: {
+        type: Number,
+        required: true,
+    },
+})
+
+const emits = defineEmits<{
+    (e: 'createSubscription', subscription: any): void
+}>()
 
 // https://vuejs.org/guide/introduction.html#composition-api
 const eventName = ref('')
@@ -134,13 +149,16 @@ const createNCSubscription = async () => {
     const { usdcTokenAddress, aUsdcTokenAddress, aaveUsdcPoolAddressesProviderAddress } =
         runtimeConfig.public.supportedChainsMetadata[chain.value?.id]
 
-    NCSubscriptionFactory.createNCSubscription(
+    const res = await NCSubscriptionFactory.createNCSubscription(
         eventName.value,
         utils.parseEther(String(stakeAmount.value)),
         usdcTokenAddress,
         aUsdcTokenAddress,
         aaveUsdcPoolAddressesProviderAddress
     )
+
+    console.log('CREATED_NC_SUBSCRIPTION: ', res)
+    emits('createSubscription', res)
 }
 
 const getSubscriptions = async () => {

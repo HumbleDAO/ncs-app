@@ -1,14 +1,12 @@
 // import { Ref } from 'nuxt/dist/app/compat/vue-demi'
 import { ethers } from 'ethers'
 import { groupBy } from 'lodash'
-import { useNetwork } from 'vagmi'
 
 import { loadAppContracts } from '@/helpers/loadAppContracts'
 
 import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStore'
 
 export const useContractsStore = defineStore('contractsStore', () => {
-    const { chain } = useNetwork()
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
     const contracts = ref({} as any)
@@ -16,9 +14,10 @@ export const useContractsStore = defineStore('contractsStore', () => {
     const provider = ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
         alchemy: runtimeConfig.alchemy.apiKey,
     })
-    async function loadContracts() {
+
+    async function loadContracts(signer?: ethers.Signer) {
         const { deployedContracts } = await loadAppContracts()
-        const preparedContracts = [] as any
+        const preparedContracts = []
         const deployedChains = []
 
         Object.keys(deployedContracts).forEach((CHAIN_ID) => {
@@ -41,7 +40,7 @@ export const useContractsStore = defineStore('contractsStore', () => {
                         instance: new ethers.Contract(
                             contractAddressAndAbi.address,
                             contractAddressAndAbi.abi,
-                            provider
+                            signer ?? provider
                         ),
                     })
                 })
@@ -52,12 +51,9 @@ export const useContractsStore = defineStore('contractsStore', () => {
             state.deployedChains = deployedChains
         })
 
-        const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
         const target = {}
-
+        const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
         const { chainId } = await provider.getNetwork()
-        console.log('allContractsGroupedByChainId: ', allContractsGroupedByChainId)
-        console.log('chain.value?.id: ', chainId)
 
         allContractsGroupedByChainId[chainId].forEach(({ name, instance }) => {
             target[name] = instance
