@@ -23,10 +23,7 @@
                     <label for="select-tokens" class="text-sm">Select stake token</label>
 
                     <div class="flex self-center mt-2">
-                        <usdcCoinSvg
-                            class="w-8 h-8 cursor-pointer"
-                            @click.prevent="checkAllowanceAndApproveNCSubscriptionFactory()"
-                        />
+                        <usdcCoinSvg class="w-8 h-8 cursor-pointer" @click.prevent="createSubscription()" />
                     </div>
                 </div>
 
@@ -43,6 +40,7 @@
 
 <script setup lang="ts">
 import { erc20ABI, useNetwork, useAccount, useConnect } from 'vagmi'
+import NCSubscriptionABI from '../contracts/ABI/NCSubscription.json'
 import { ethers, BigNumber, utils } from 'ethers'
 import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
 
@@ -69,7 +67,7 @@ onMounted(async () => {
         const signer = await activeConnector.value.getSigner()
         console.log('SIGNER: ', signer)
         usdcContract.value = new ethers.Contract(
-            runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.usdcTokenAddress,
+            runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.,
             erc20ABI,
             signer
         )
@@ -87,6 +85,68 @@ const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
     if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
         await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
     }
+}
+
+const checkAllowanceAndApproveSubscription = async (subAddress) => {
+    const signer = await activeConnector.value.getSigner()
+    const subscription = new ethers.Contract(
+            subAddress,
+            NCSubscriptionABI,
+            signer
+        )
+    const checkAllowance = await usdcContract.value.allowance(subAddress, address.value)
+
+    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
+        await usdcContract.value.approve(subAddress, utils.parseEther(String(100000000)))
+    }
+}
+
+const createSubscription = async () => {
+    checkAllowanceAndApproveNCSubscriptionFactory()
+    const { NCSubscriptionFactory } = contracts.value
+
+    const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
+
+    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
+        await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
+    }
+    NCSubscriptionFactory.createSubscription(eventName.value, utils.parseEther(String(stakeAmount.value)),"0x2058a9d7613eee744279e3856ef0eada5fcbaa7e", "0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9","0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644")
+}
+
+const getSubscriptions = async () => {
+    const { NCSubscriptionFactory } = contracts.value
+    const subscriptions = await NCSubscriptionFactory.subscriptions()
+    return subscriptions
+    console.log('SUBSCRIPTIONS: ', subscriptions)
+}
+
+const getSubscriptionsByUser = async (address) => {
+    const { NCSubscriptionFactory } = contracts.value
+    const subscriptions = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(address)
+    return subscriptions
+    console.log('SUBSCRIPTIONS BY USER: ', subscriptions)
+}
+
+const subscribe = async (subAddress) => {
+    const signer = await activeConnector.value.getSigner()
+    const subscription = new ethers.Contract(
+            subAddress,
+            NCSubscriptionABI,
+            signer
+        )
+        checkAllowanceAndApproveSubscription(subAddress)
+        subscription.subscribe()
+
+}
+
+const unsubscribe = async (subAddress) => {
+    const signer = await activeConnector.value.getSigner()
+    const subscription = new ethers.Contract(
+            subAddress,
+            NCSubscriptionABI,
+            signer
+        )
+        subscription.unsubscribe()
 }
 
 watch(
