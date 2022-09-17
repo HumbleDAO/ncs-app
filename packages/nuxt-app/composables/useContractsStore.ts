@@ -55,6 +55,10 @@ export const useContractsStore = defineStore('contractsStore', () => {
         alchemy: runtimeConfig.alchemy.apiKey,
     })
 
+    const quicknodeProvider = ethers.getDefaultProvider(runtimeConfig.quicknode.https)
+
+    console.log('QUICKNODE PROVIDER', quicknodeProvider)
+
     async function loadContracts(signer?: ethers.Signer) {
         const { deployedContracts } = await loadAppContracts()
         const preparedContracts = []
@@ -80,7 +84,7 @@ export const useContractsStore = defineStore('contractsStore', () => {
                         instance: new ethers.Contract(
                             contractAddressAndAbi.address,
                             contractAddressAndAbi.abi,
-                            signer ?? provider
+                            signer ?? quicknodeProvider
                         ),
                     })
                 })
