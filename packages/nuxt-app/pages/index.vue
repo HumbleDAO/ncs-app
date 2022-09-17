@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap justify-center items-center overflow-y-auto">
+        <div class="flex flex-wrap justify-center items-center overflow-auto">
             <div
                 v-for="subscription in subscriptions"
                 :key="subscription.nftAddress"

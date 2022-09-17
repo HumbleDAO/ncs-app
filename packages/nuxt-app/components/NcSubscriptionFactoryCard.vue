@@ -2,7 +2,7 @@
     <nc-card title="Create Subscription" description="">
         <template #icon>
             <div class="avatar self-center" name="icon">
-                <div class="w-24 rounded">
+                <div class="w-20 rounded">
                     <img src="@/assets/handshake.png" />
                 </div>
             </div>
@@ -20,7 +20,7 @@
 
             <div class="flex justify-between border-opacity-50">
                 <div class="w-2/4 flex flex-col justify-center">
-                    <label for="select-tokens" class="text-sm">Select stake token</label>
+                    <label for="select-tokens" class="text-sm text-center">Select stake token</label>
 
                     <div class="flex self-center mt-2">
                         <usdcCoinSvg class="w-8 h-8 cursor-pointer" @click.prevent="createNCSubscription()" />

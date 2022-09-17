@@ -6,7 +6,7 @@
 
             <slot name="icon" class="self-center" />
 
-            <p class="card-description">{{ props.description }}</p>
+            <p v-if="props.description" class="card-description">{{ props.description }}</p>
 
             <slot name="default" />
 
