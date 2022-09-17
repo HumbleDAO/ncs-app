@@ -1,38 +1,35 @@
 <template>
-    <nc-card title="Create Subscription" :description="props.description">
+    <nc-card :title="props.subscription.eventName" :description="props.description">
         <template #icon>
             <div class="avatar self-center" name="icon">
-                <div class="w-24 rounded">
+                <div class="w-16 rounded">
                     <img src="@/assets/chartsoncomputer.png" />
                 </div>
             </div>
         </template>
 
         <template #default>
-            <nc-input v-model="eventName" type="text" placeholder="service..." />
-
-            <div class="flex flex-col my-2">
-                <label for="nc-input-stake-amount" class="text-sm self-start">
-                    Staked Amount Required to Subscribe
-                </label>
-                <nc-input v-model="stakeAmount" type="number" placeholder="0..." />
-            </div>
-
-            <div class="flex justify-between border-opacity-50">
+            <div class="flex justify-between border-opacity-50 my-5">
                 <div class="w-2/4 flex flex-col justify-center">
-                    <label for="select-tokens" class="text-sm">Select stake token</label>
-
                     <div class="flex self-center mt-2">
-                        <usdcCoinSvg class="w-8 h-8 cursor-pointer" @click.prevent="createNCSubscription()" />
+                        <usdcCoinSvg class="w-10 h-10 cursor-pointer" @click.prevent="" />
                     </div>
                 </div>
 
-                <div class="divide-y-1a text-6xl h-full">&verbar;</div>
+                <div class="divide-y text-6xl h-full">&verbar;</div>
 
                 <div class="w-2/4 flex items-center justify-center">
                     <!-- TODO: Ensure apy is fetched for -->
-                    <label for="apy">{{ apy }} APY %</label>
+                    <label for="apy">
+                        $ {{ ethers.utils.formatEther(BigNumber.from(props.subscription.poolSize)) }}
+                    </label>
                 </div>
+            </div>
+
+            <div class="flex justify-center">
+                <p class="text-xs font-extralight underline">
+                    You can unsubcribe and unstake at any time to retrieve your funds
+                </p>
             </div>
         </template>
     </nc-card>
@@ -43,8 +40,8 @@ import { erc20ABI, useNetwork, useAccount, useConnect } from 'vagmi'
 import NCSubscriptionABI from '../contracts/ABI/NCSubscription.json'
 import { ethers, BigNumber, utils } from 'ethers'
 import usdcCoinSvg from '@/assets/usdc-icon.svg?component'
+import { ISubscription, Subscription } from '~~/composables/useContractsStore'
 
-// https://vuejs.org/guide/reusability/composables.html
 const runtimeConfig = useRuntimeConfig()
 const { address } = useAccount()
 const { activeConnector, isConnected } = useConnect()
@@ -54,20 +51,16 @@ const props = defineProps({
         type: String,
         required: true,
     },
-    stakedAmount: {
-        type: Number,
+    subscription: {
+        type: Object,
         required: true,
+        validation: (value: ISubscription) => {
+            return value instanceof Subscription
+        },
     },
 })
 
-const emits = defineEmits<{
-    (e: 'createSubscription', subscription: any): void
-}>()
-
-// https://vuejs.org/guide/introduction.html#composition-api
-const eventName = ref('')
-const stakeAmount = ref(0)
-const apy = ref(0)
+const stakeAmount = ref('')
 const allowance = ref<BigNumber>(BigNumber.from(0))
 const allowanceInEthers = ref()
 
@@ -82,16 +75,14 @@ watch(
 )
 
 watch(
-    () => isConnected.value,
-    (isConnected) => {
-        console.log('ISCONNECTED: ', isConnected)
-        init()
+    () => props.subscription.poolSize,
+    (newPoolSize: BigNumber) => {
+        console.log('newPoolSize', newPoolSize)
+        stakeAmount.value = BigNumber.from(newPoolSize).toString()
     }
 )
 
-// https://vuejs.org/guide/essentials/lifecycle.html#registering-lifecycle-hooks
 onMounted(async () => {
-    console.log('ISCONNECTED: ', isConnected.value)
     if (isConnected.value) {
         await init()
     }
@@ -114,16 +105,6 @@ const init = async () => {
     allowance.value = await usdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
 }
 
-const checkAllowanceAndApproveNCSubscriptionFactory = async () => {
-    const { NCSubscriptionFactory } = contracts.value
-
-    const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
-
-    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
-        await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
-    }
-}
-
 const checkAllowanceAndApproveSubscription = async (subAddress) => {
     const signer = await activeConnector.value.getSigner()
     const subscription = new ethers.Contract(subAddress, NCSubscriptionABI, signer)
@@ -132,33 +113,6 @@ const checkAllowanceAndApproveSubscription = async (subAddress) => {
     if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
         await usdcContract.value.approve(subAddress, utils.parseEther(String(100000000)))
     }
-}
-
-const createNCSubscription = async () => {
-    const { chain } = useNetwork()
-    const signer = await activeConnector.value.getSigner()
-    const { loadContracts } = useContractsStore()
-    checkAllowanceAndApproveNCSubscriptionFactory()
-    const { NCSubscriptionFactory } = await loadContracts(signer)
-
-    const checkAllowance = await usdcContract.value.allowance(NCSubscriptionFactory.address, address.value)
-
-    if (BigNumber.isBigNumber(checkAllowance) && allowanceInEthers.value < stakeAmount.value) {
-        await usdcContract.value.approve(NCSubscriptionFactory.address, utils.parseEther(String(stakeAmount.value)))
-    }
-    const { usdcTokenAddress, aUsdcTokenAddress, aaveUsdcPoolAddressesProviderAddress } =
-        runtimeConfig.public.supportedChainsMetadata[chain.value?.id]
-
-    const res = await NCSubscriptionFactory.createNCSubscription(
-        eventName.value,
-        utils.parseEther(String(stakeAmount.value)),
-        usdcTokenAddress,
-        aUsdcTokenAddress,
-        aaveUsdcPoolAddressesProviderAddress
-    )
-
-    console.log('CREATED_NC_SUBSCRIPTION: ', res)
-    emits('createSubscription', res)
 }
 
 const getSubscriptions = async () => {

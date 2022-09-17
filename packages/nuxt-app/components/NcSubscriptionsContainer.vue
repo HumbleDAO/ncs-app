@@ -46,7 +46,6 @@ watch(
 )
 
 onMounted(async () => {
-    console.log('ISCONNECTED: ', isConnected.value)
     if (isConnected.value) {
         await init()
     }
@@ -54,20 +53,19 @@ onMounted(async () => {
 
 const init = async () => {
     contracts.value = await useContractsStore().loadContracts()
+
     const { chain } = useNetwork()
 
     const signer = await activeConnector.value.getSigner()
-    console.log('SIGNER: ', signer)
+
     usdcContract.value = new ethers.Contract(
         runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.usdcTokenAddress,
         erc20ABI,
         signer
     )
 
-    console.log('USDC CONTRACT: ', usdcContract.value)
-
     const { NCSubscriptionFactory } = contracts.value
-    console.log('NCSubscriptionFactory: ', NCSubscriptionFactory)
+
     allowance.value = await usdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
 }
 
