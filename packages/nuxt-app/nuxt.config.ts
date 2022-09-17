@@ -6,9 +6,18 @@ const SUPPORTED_CHAINS_METADATA = {
     31337: {
         network: 'hardhat',
         chainId: 31337,
-        apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
-        https: process.env.MUMBAI_ALCHEMY_HTTPS,
-        websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
+        alchemy: {
+            apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
+            https: process.env.MUMBAI_ALCHEMY_HTTPS,
+            websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
+        },
+
+        quicknode: {
+            apiKey: process.env.MUMBAI_QUICKNODE_API_KEY,
+            https: process.env.MUMBAI_QUICKNODE_HTTPS,
+            websocket: process.env.MUMBAI_QUICKNODE_WEBSOCKET,
+        },
+
         aaveUsdcPoolAddressesProviderAddress: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B',
         aUsdcTokenAddress: '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
         usdcTokenAddress: '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
@@ -16,9 +25,17 @@ const SUPPORTED_CHAINS_METADATA = {
     80001: {
         network: 'polygonMumbai',
         chainId: 80001,
-        apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
-        https: process.env.MUMBAI_ALCHEMY_HTTPS,
-        websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
+        alchemy: {
+            apiKey: process.env.MUMBAI_ALCHEMY_API_KEY,
+            https: process.env.MUMBAI_ALCHEMY_HTTPS,
+            websocket: process.env.MUMBAI_ALCHEMY_WEBSOCKET,
+        },
+
+        quicknode: {
+            apiKey: process.env.MUMBAI_QUICKNODE_API_KEY,
+            https: process.env.MUMBAI_QUICKNODE_HTTPS,
+            websocket: process.env.MUMBAI_QUICKNODE_WEBSOCKET,
+        },
         aaveUsdcPoolAddressesProviderAddress: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B',
         aUsdcTokenAddress: '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
         usdcTokenAddress: '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
@@ -26,8 +43,17 @@ const SUPPORTED_CHAINS_METADATA = {
     137: {
         network: 'polygon',
         chainId: 137,
-        apiKey: process.env.POLYGON_ALCHEMY_API_KEY,
-        websocket: process.env.POLYGON_ALCHEMY_WEBSOCKET,
+        alchemy: {
+            apiKey: process.env.POLYGON_ALCHEMY_API_KEY,
+            https: process.env.POLYGON_ALCHEMY_HTTPS,
+            websocket: process.env.POLYGON_ALCHEMY_WEBSOCKET,
+        },
+
+        quicknode: {
+            apiKey: process.env.POLYGON_QUICKNODE_API_KEY,
+            https: process.env.POLYGON_QUICKNODE_HTTPS,
+            websocket: process.env.POLYGON_QUICKNODE_WEBSOCKET,
+        },
         aaveUsdcPoolAddressesProviderAddress: '0xd05e3E715d945B59290df0ae8eF85c1BdB684744',
         aUsdcTokenAddress: '0x1a13F4Ca1d028320A707D99520AbFefca3998b7F',
         usdcTokenAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
@@ -72,7 +98,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             supportedChainsMetadata: SUPPORTED_CHAINS_METADATA,
-            alchemy: SUPPORTED_CHAINS_METADATA[process.env.CHAIN_ID ?? 31337],
+            alchemy: SUPPORTED_CHAINS_METADATA[process.env.CHAIN_ID ?? 31337].alchemy,
+            quicknode: SUPPORTED_CHAINS_METADATA[process.env.CHAIN_ID ?? 31337].quicknode,
         },
     },
 

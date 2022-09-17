@@ -2,27 +2,43 @@ import { configureChains, createClient, chain, VagmiPlugin } from 'vagmi'
 import { publicProvider } from 'vagmi/providers/public'
 import { infuraProvider } from 'vagmi/providers/infura'
 import { alchemyProvider } from 'vagmi/providers/alchemy'
+import { jsonRpcProvider } from 'vagmi/providers/jsonRpc'
 import { MetaMaskConnector } from 'vagmi/connectors/metaMask'
 import { WalletConnectConnector } from 'vagmi/connectors/walletConnect'
 import { InjectedConnector } from 'vagmi/connectors/injected'
 
 export default defineNuxtPlugin((nuxtApp) => {
+    const runtimeConfig = useRuntimeConfig()
+
     const { chains, provider, webSocketProvider } = configureChains(
         [
             // chain.polygon,
-
             chain.polygonMumbai,
             chain.hardhat,
         ],
         [
-            alchemyProvider({
-                alchemyId: useRuntimeConfig().alchemy.apiKey,
-                priority: 0,
+            jsonRpcProvider({
+                rpc: (chain) => {
+                    if (!Object.keys(runtimeConfig.public.supportedChainsMetadata).includes(chain.id.toString())) {
+                        return null
+                    }
+                    return {
+                        http: runtimeConfig.public.quicknode.https,
+                        webSocket: runtimeConfig.public.quicknode.websocket,
+                    }
+                },
+                priority: 1,
                 stallTimeout: 1000,
                 weight: 1,
             }),
-            infuraProvider({ priority: 2, stallTimeout: 1000, weight: 2 }),
-            publicProvider({ priority: 1, stallTimeout: 1000, weight: 3 }),
+            alchemyProvider({
+                alchemyId: runtimeConfig.alchemy.apiKey,
+                priority: 2,
+                stallTimeout: 1000,
+                weight: 2,
+            }),
+            infuraProvider({ priority: 3, stallTimeout: 1000, weight: 3 }),
+            publicProvider({ priority: 4, stallTimeout: 1000, weight: 4 }),
         ]
     )
 

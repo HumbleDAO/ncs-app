@@ -46,14 +46,22 @@ export class Subscription {
     }
 }
 
-export const useContractsStore = defineStore('contractsStore', () => {
+export interface IContractsStoreConfig {
+    provider: string
+}
+
+export const useContractsStore = defineStore('contractsStore', (config = { provider: 'quicknode' }) => {
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
     const contracts = ref({} as any)
 
-    const provider = ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
-        alchemy: runtimeConfig.alchemy.apiKey,
+    const alchemyProvider = ethers.getDefaultProvider(runtimeConfig.public.alchemy.https, {
+        alchemy: runtimeConfig.public.alchemy.apiKey,
     })
+
+    const quicknodeProvider = ethers.getDefaultProvider(runtimeConfig.public.quicknode.https)
+
+    const provider = config.provider === 'alchemy' ? alchemyProvider : quicknodeProvider
 
     async function loadContracts(signer?: ethers.Signer) {
         const { deployedContracts } = await loadAppContracts()
