@@ -1,26 +1,23 @@
 // import { Ref } from 'nuxt/dist/app/compat/vue-demi'
 import { ethers } from 'ethers'
 import { groupBy } from 'lodash'
-import { useNetwork } from 'vagmi'
 
 import { loadAppContracts } from '@/helpers/loadAppContracts'
 
 import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStore'
 
 export const useContractsStore = defineStore('contractsStore', () => {
-    const { chain } = useNetwork()
-    const { isChainSupported } = useSupportedChainsStore()
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
     const contracts = ref({} as any)
 
-    async function loadContracts() {
-        if (!isChainSupported(chain.value?.id)) {
-            return console.log(`Chain ${chain.value?.id} is not supported`)
-        }
+    const provider = ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
+        alchemy: runtimeConfig.alchemy.apiKey,
+    })
 
+    async function loadContracts(signer?: ethers.Signer) {
         const { deployedContracts } = await loadAppContracts()
-        const preparedContracts = [] as any
+        const preparedContracts = []
         const deployedChains = []
 
         Object.keys(deployedContracts).forEach((CHAIN_ID) => {
@@ -43,9 +40,7 @@ export const useContractsStore = defineStore('contractsStore', () => {
                         instance: new ethers.Contract(
                             contractAddressAndAbi.address,
                             contractAddressAndAbi.abi,
-                            ethers.getDefaultProvider(runtimeConfig.alchemy.https, {
-                                alchemy: runtimeConfig.alchemy.apiKey,
-                            })
+                            signer ?? provider
                         ),
                     })
                 })
@@ -56,23 +51,20 @@ export const useContractsStore = defineStore('contractsStore', () => {
             state.deployedChains = deployedChains
         })
 
-        const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
         const target = {}
+        const allContractsGroupedByChainId = groupBy(preparedContracts, 'chainId')
+        const { chainId } = await provider.getNetwork()
 
-        console.log('allContractsGroupedByChainId: ', allContractsGroupedByChainId)
-        console.log('chain.value?.id: ', chain.value?.id)
-
-        allContractsGroupedByChainId[chain.value?.id ?? runtimeConfig.public.supportedChains[80001]].forEach(
-            ({ name, instance }) => {
-                target[name] = instance
-            }
-        )
+        allContractsGroupedByChainId[chainId].forEach(({ name, instance }) => {
+            target[name] = instance
+        })
 
         contracts.value = target
+
         return contracts.value
     }
 
-    return { loadContracts, contracts: computed(() => contracts.value) }
+    return { loadContracts, contracts: computed(() => contracts.value), provider }
 })
 
 export interface IContract {

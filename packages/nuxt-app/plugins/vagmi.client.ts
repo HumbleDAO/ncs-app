@@ -1,4 +1,4 @@
-import { configureChains, createClient, defaultChains, chain, VagmiPlugin } from 'vagmi'
+import { configureChains, createClient, chain, VagmiPlugin } from 'vagmi'
 import { publicProvider } from 'vagmi/providers/public'
 import { infuraProvider } from 'vagmi/providers/infura'
 import { alchemyProvider } from 'vagmi/providers/alchemy'
@@ -13,7 +13,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
             chain.polygonMumbai,
             chain.hardhat,
-            chain.localhost,
         ],
         [
             alchemyProvider({

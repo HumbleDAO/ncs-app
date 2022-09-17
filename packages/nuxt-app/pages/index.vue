@@ -22,14 +22,24 @@
 </template>
 
 <script setup lang="ts">
+import { BigNumber, ethers } from 'ethers'
+import { erc20ABI, useAccount, useConnect, useNetwork } from 'vagmi'
+
 definePageMeta({
     colorMode: 'luxury',
 })
 
 const colorMode = useColorMode()
 
-const { loadContracts } = useContractsStore()
-const { data: contracts } = useAsyncData('contracts', async () => await loadContracts())
+const runtimeConfig = useRuntimeConfig()
+const { address } = useAccount()
+const { activeConnector, isConnected } = useConnect()
+
+const allowance = ref<BigNumber>(BigNumber.from(0))
+let usdcContract = ref<ethers.Contract>()
+let contracts = ref({} as any)
+let subscriptions = ref([] as any)
+let subscriptionsByUsers = ref([] as any)
 
 const contractsAddresses = computed(() => {
     if (!contracts.value) return []
@@ -39,4 +49,58 @@ const contractsAddresses = computed(() => {
         address: contracts.value[key].address,
     }))
 })
+
+watch(
+    () => subscriptions.value,
+    (newSubscriptions) => {
+        console.log('NEW SUBSCRIPTIONS: ', newSubscriptions)
+    }
+)
+
+watch(
+    () => isConnected.value,
+    (isConnected) => {
+        console.log('ISCONNECTED: ', isConnected)
+        init()
+    }
+)
+
+onMounted(async () => {
+    console.log('ISCONNECTED: ', isConnected.value)
+    if (isConnected.value) {
+        await init()
+    }
+})
+
+const init = async () => {
+    contracts.value = await useContractsStore().loadContracts()
+    const { chain } = useNetwork()
+
+    const signer = await activeConnector.value?.getSigner()
+
+    usdcContract.value = new ethers.Contract(
+        runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.usdcTokenAddress,
+        erc20ABI,
+        signer
+    )
+
+    const { NCSubscriptionFactory } = contracts.value
+
+    allowance.value = await usdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
+
+    await getSubscriptions()
+}
+
+const getSubscriptions = async () => {
+    const { NCSubscriptionFactory } = contracts.value
+    console.log('NCSubscriptionFactory: ', NCSubscriptionFactory)
+    subscriptions.value = await NCSubscriptionFactory.subscriptions()
+    console.log('SUBSCRIPTIONS: ', subscriptions.value)
+}
+
+const getSubscriptionsByUser = async (address) => {
+    const { NCSubscriptionFactory } = contracts.value
+
+    subscriptionsByUsers.value = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(address)
+}
 </script>
