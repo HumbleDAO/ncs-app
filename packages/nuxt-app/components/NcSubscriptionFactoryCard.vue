@@ -68,25 +68,15 @@ watch(
 
 watch(
     () => isConnected.value,
-<<<<<<< HEAD
-    (isConnected) => {
-        console.log('ISCONNECTED: ', isConnected)
-        init()
-=======
     async (isConnected) => {
         if (isConnected) {
             await init()
         }
->>>>>>> hugoce17/hum-77-create-ncsubscriptioncard-to-render
     }
 )
 
 // https://vuejs.org/guide/essentials/lifecycle.html#registering-lifecycle-hooks
 onMounted(async () => {
-<<<<<<< HEAD
-    console.log('ISCONNECTED: ', isConnected.value)
-=======
->>>>>>> hugoce17/hum-77-create-ncsubscriptioncard-to-render
     if (isConnected.value) {
         await init()
     }
@@ -147,15 +137,9 @@ const createNCSubscription = async () => {
     NCSubscriptionFactory.createNCSubscription(
         eventName.value,
         utils.parseEther(String(stakeAmount.value)),
-<<<<<<< HEAD
-        usdcTokenAddress,
-        aUsdcTokenAddress,
-        aaveUsdcPoolAddressesProviderAddress
-=======
         usdcTokenAddress, // '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
         aUsdcTokenAddress, // '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
         aaveUsdcPoolAddressesProviderAddress // '0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644'
->>>>>>> hugoce17/hum-77-create-ncsubscriptioncard-to-render
     )
 }
 
