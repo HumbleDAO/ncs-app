@@ -2,11 +2,11 @@
     <div class="card w-96 bg-base-100 shadow-xl image-full">
         <!-- <figure><img src="https://placeimg.com/400/225/arch" alt="subsc" /></figure> -->
         <div class="card-body flex flex-col">
-            <slot name="icon" class="self-center" />
-
             <h2 class="card-title self-center">{{ props.title }}</h2>
 
-            <p>{{ props.description }}</p>
+            <slot name="icon" class="self-center" />
+
+            <p v-if="props.description" class="card-description">{{ props.description }}</p>
 
             <slot name="default" />
 
@@ -32,4 +32,8 @@ const props = defineProps({
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.card-description {
+    @apply text-base my-5 text-center;
+}
+</style>

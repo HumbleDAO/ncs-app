@@ -2,7 +2,7 @@
     <nc-card title="Create Subscription" description="">
         <template #icon>
             <div class="avatar self-center" name="icon">
-                <div class="w-24 rounded">
+                <div class="w-20 rounded">
                     <img src="@/assets/handshake.png" />
                 </div>
             </div>
@@ -20,7 +20,7 @@
 
             <div class="flex justify-between border-opacity-50">
                 <div class="w-2/4 flex flex-col justify-center">
-                    <label for="select-tokens" class="text-sm">Select stake token</label>
+                    <label for="select-tokens" class="text-sm text-center">Select stake token</label>
 
                     <div class="flex self-center mt-2">
                         <usdcCoinSvg class="w-8 h-8 cursor-pointer" @click.prevent="createNCSubscription()" />
@@ -68,15 +68,25 @@ watch(
 
 watch(
     () => isConnected.value,
+<<<<<<< HEAD
     (isConnected) => {
         console.log('ISCONNECTED: ', isConnected)
         init()
+=======
+    async (isConnected) => {
+        if (isConnected) {
+            await init()
+        }
+>>>>>>> hugoce17/hum-77-create-ncsubscriptioncard-to-render
     }
 )
 
 // https://vuejs.org/guide/essentials/lifecycle.html#registering-lifecycle-hooks
 onMounted(async () => {
+<<<<<<< HEAD
     console.log('ISCONNECTED: ', isConnected.value)
+=======
+>>>>>>> hugoce17/hum-77-create-ncsubscriptioncard-to-render
     if (isConnected.value) {
         await init()
     }
@@ -137,9 +147,15 @@ const createNCSubscription = async () => {
     NCSubscriptionFactory.createNCSubscription(
         eventName.value,
         utils.parseEther(String(stakeAmount.value)),
+<<<<<<< HEAD
         usdcTokenAddress,
         aUsdcTokenAddress,
         aaveUsdcPoolAddressesProviderAddress
+=======
+        usdcTokenAddress, // '0x2058a9d7613eee744279e3856ef0eada5fcbaa7e',
+        aUsdcTokenAddress, // '0x2271e3Fef9e15046d09E1d78a8FF038c691E9Cf9',
+        aaveUsdcPoolAddressesProviderAddress // '0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644'
+>>>>>>> hugoce17/hum-77-create-ncsubscriptioncard-to-render
     )
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="h-screen" :data-theme="colorMode.preference">
+    <div class="h-screen w-screen" :data-theme="colorMode.preference">
         <nc-drawer>
             <nc-navbar />
 
@@ -11,5 +11,3 @@
 <script setup>
 const colorMode = useColorMode()
 </script>
-
-<style lang="scss" scoped></style>

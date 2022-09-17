@@ -6,6 +6,46 @@ import { loadAppContracts } from '@/helpers/loadAppContracts'
 
 import { useNetworkDetailsStore, INetworkDetails } from './useNetworkDetailsStore'
 
+export interface IContract {
+    [key: string]: ethers.Contract
+}
+
+export type TSubscription = {
+    address: string
+    eventName: string
+    poolSize: ethers.BigNumber
+    token: string
+    underlyingToken: string
+    nftAddress: string
+    nft: ethers.Contract
+    aaveLendingPoolAddressesProvider: string
+}
+
+export interface ISubscription {
+    address: string
+    eventName: string
+    poolSize: ethers.BigNumber
+    token: string
+    underlyingToken: string
+    nftAddress: string
+    nft: ethers.Contract
+    aaveLendingPoolAddressesProvider: string
+}
+export class Subscription {
+    public address: string
+    public eventName: string
+    public poolSize: ethers.BigNumber
+    public token: string
+    public underlyingToken: string
+    public nftAddress: string
+    public nft: ethers.Contract
+    public aaveLendingPoolAddressesProvider: string
+
+    constructor(subscription: TSubscription) {
+        Object.assign(this, subscription)
+    }
+}
+
 export const useContractsStore = defineStore('contractsStore', () => {
     const runtimeConfig = useRuntimeConfig()
     const networkDetailsStore = useNetworkDetailsStore()
@@ -66,7 +106,3 @@ export const useContractsStore = defineStore('contractsStore', () => {
 
     return { loadContracts, contracts: computed(() => contracts.value), provider }
 })
-
-export interface IContract {
-    [key: string]: ethers.Contract
-}

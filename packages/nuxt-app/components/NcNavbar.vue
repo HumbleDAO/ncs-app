@@ -64,10 +64,10 @@ import { INetworkDetails } from '@/composables/useNetworkDetailsStore'
 import { BigNumber, ethers, utils } from 'ethers'
 
 const emit = defineEmits(['toggleDrawer'])
+
 const { address } = useAccount()
 const { chain, chains } = useNetwork()
 const runtimeConfig = useRuntimeConfig()
-const nuxtApp = useNuxtApp()
 
 const { isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
     chainId: 80001,
@@ -81,6 +81,7 @@ const { isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
         })
     },
 })
+
 const { disconnect } = useDisconnect()
 const { connect, isConnected, activeConnector } = useConnect({
     connector: new InjectedConnector({ chains: chains.value }),
@@ -96,6 +97,7 @@ const { connect, isConnected, activeConnector } = useConnect({
         })
     },
 })
+
 const { data: ensName } = useEnsName({
     address: address,
 })
@@ -105,21 +107,11 @@ const allowanceInEthers = ref()
 
 let usdcContract = ref<ethers.Contract>()
 let contracts = ref({} as any)
-let subscriptions = ref([] as any)
-let subscriptionsByUsers = ref([] as any)
 
 watch(
     () => allowance.value,
     (newAllowance) => {
         allowanceInEthers.value = utils.formatEther(newAllowance)
-    }
-)
-
-watch(
-    () => chains.value,
-    (newChains) => {
-        console.log('CHAINS_VALUE: ', chains.value)
-        console.log('NUXT_APP: ', nuxtApp.$vagmi)
     }
 )
 
@@ -144,18 +136,6 @@ const init = async () => {
     const { NCSubscriptionFactory } = contracts.value
 
     allowance.value = await usdcContract.value.allowance(address.value, NCSubscriptionFactory.address)
-}
-
-const getSubscriptions = async () => {
-    const { NCSubscriptionFactory } = contracts.value
-
-    subscriptions.value = await NCSubscriptionFactory.subscriptions()
-}
-
-const getSubscriptionsByUser = async (address) => {
-    const { NCSubscriptionFactory } = contracts.value
-
-    subscriptionsByUsers.value = await NCSubscriptionFactory.getSubscriptionsCreatedByOwner(address)
 }
 
 function toggleDrawer() {

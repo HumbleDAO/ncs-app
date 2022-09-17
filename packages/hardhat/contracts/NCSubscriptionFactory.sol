@@ -57,4 +57,8 @@ contract NCSubscriptionFactory is Ownable {
     function getSubscriptionsCreatedByOwner(address _owner) external view returns (address[] memory) {
         return ownerNCSubscriptions[_owner];
     }
+
+    function getSubscriptions() external view returns (NCSubscription[] memory) {
+        return subscriptions;
+    }
 }
