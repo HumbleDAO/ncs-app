@@ -82,7 +82,11 @@ const { isLoading, pendingChainId, switchNetwork } = useSwitchNetwork({
     },
 })
 
-const { disconnect } = useDisconnect()
+const { disconnect } = useDisconnect({
+    onSuccess: () => {
+        useRouter().go(0)
+    },
+})
 const { connect, isConnected, activeConnector } = useConnect({
     connector: new InjectedConnector({ chains: chains.value }),
     onError: (error) => {
