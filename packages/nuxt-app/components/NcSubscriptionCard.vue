@@ -31,11 +31,38 @@
                     You can unsubcribe and unstake at any time to retrieve your funds
                 </p>
             </div>
+
+            <div id="actions">
+                <div v-if="isSubscribed" class="flex justify-center">
+                    <button
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        @click="unsubscribe"
+                    >
+                        Unsubscribe
+                    </button>
+                </div>
+                <div v-if="!isSubscribed" class="flex justify-center">
+                    <button
+                        class="bg-blue-500 mx-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        @click="subscribe"
+                    >
+                        Subscribe
+                    </button>
+                    <button
+                        class="bg-blue-500 mx-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        @click="subscribe"
+                    >
+                        Swap to Monthly
+                    </button>
+                </div>
+            </div>
         </template>
     </nc-card>
 </template>
 
 <script setup lang="ts">
+import { isProxy, toRaw } from 'vue'
+
 import { erc20ABI, useNetwork, useAccount, useConnect } from 'vagmi'
 import NCSubscriptionABI from '../contracts/ABI/NCSubscription.json'
 import { ethers, BigNumber, utils } from 'ethers'
@@ -63,6 +90,7 @@ const props = defineProps({
 const stakeAmount = ref('')
 const allowance = ref<BigNumber>(BigNumber.from(0))
 const allowanceInEthers = ref()
+const isSubscribed = ref(false)
 
 let usdcContract = ref<ethers.Contract>()
 let contracts = ref({} as any)
@@ -93,6 +121,29 @@ const init = async () => {
     const { chain } = useNetwork()
 
     const signer = await activeConnector.value?.getSigner()
+
+    // All this needs a refactor for security
+
+    let account_address = await signer.getAddress()
+    const headers = {
+        'Content-Type': 'application/json',
+        Authorization: '5dbfb5d6-63d0-4e04-a054-29b750c5d592',
+    }
+
+    const { data } = await useFetch(`https://api.nftport.xyz/v0/accounts/${account_address}?chain=polygon`, {
+        headers: headers,
+    })
+    let nftsOwned = toRaw(data.value).nfts
+    let subscription = toRaw(props.subscription)
+    // grab all contract_address properties from data and put them in an array
+
+    nftsOwned.map((nft) => {
+        const contract_address = nft.contract_address
+        if (contract_address === subscription.nftAddress) {
+            isSubscribed.value = true
+        }
+    })
+    console.log('NFT DATA', nftsOwned, subscription.nftAddress, isSubscribed.value)
 
     usdcContract.value = new ethers.Contract(
         runtimeConfig.public.supportedChainsMetadata[chain.value?.id]?.usdcTokenAddress,
@@ -127,17 +178,22 @@ const getSubscriptionsByUser = async (address) => {
     return subscriptions
 }
 
-const subscribe = async (subAddress) => {
+const subscribe = async () => {
+    let subscription = toRaw(props.subscription)
+
     const signer = await activeConnector.value.getSigner()
-    const subscription = new ethers.Contract(subAddress, NCSubscriptionABI, signer)
-    checkAllowanceAndApproveSubscription(subAddress)
-    subscription.subscribe()
+    const subscriptionContract = await new ethers.Contract(subscription.nftAddress, NCSubscriptionABI, signer)
+    console.log(subscriptionContract, 'Sub Cntract')
+    checkAllowanceAndApproveSubscription(subscription.nftAddress)
+    // subscriptionContract.subscribe()
 }
 
-const unsubscribe = async (subAddress) => {
+const unsubscribe = async () => {
+    let subscription = toRaw(props.subscription)
+
     const signer = await activeConnector.value.getSigner()
-    const subscription = new ethers.Contract(subAddress, NCSubscriptionABI, signer)
-    subscription.unsubscribe()
+    const subscriptionContract = await new ethers.Contract(subscription.nftAddress, NCSubscriptionABI, signer)
+    subscriptionContract.unsubscribe()
 }
 </script>
 
