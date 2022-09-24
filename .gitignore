@@ -9,7 +9,7 @@ packages/hardhat/artifacts*
 packages/hardhat/deployments
 packages/nuxt-app/contracts/*
 !packages/nuxt-app/contracts/external_contracts.js
-!packages/nuxt-app/contracts/hardhat_contracts.js
+!packages/nuxt-app/contracts/hardhat_contracts.json
 packages/hardhat/cache*
 packages/**/data
 !packages/nuxt-app/contracts/contracts.js
