@@ -9,38 +9,39 @@ import { InjectedConnector } from 'vagmi/connectors/injected'
 
 export default defineNuxtPlugin((nuxtApp) => {
     const runtimeConfig = useRuntimeConfig()
+    const configuredChains =
+        process.env.NODE_ENV === 'production'
+            ? [chain.polygonMumbai]
+            : [
+                  // chain.polygon,
+                  chain.polygonMumbai,
+                  chain.hardhat,
+              ]
 
-    const { chains, provider, webSocketProvider } = configureChains(
-        [
-            // chain.polygon,
-            chain.polygonMumbai,
-            chain.hardhat,
-        ],
-        [
-            jsonRpcProvider({
-                rpc: (chain) => {
-                    if (!Object.keys(runtimeConfig.public.supportedChainsMetadata).includes(chain.id.toString())) {
-                        return null
-                    }
-                    return {
-                        http: runtimeConfig.public.quicknode.https,
-                        webSocket: runtimeConfig.public.quicknode.websocket,
-                    }
-                },
-                priority: 1,
-                stallTimeout: 1000,
-                weight: 1,
-            }),
-            alchemyProvider({
-                alchemyId: runtimeConfig.alchemy.apiKey,
-                priority: 2,
-                stallTimeout: 1000,
-                weight: 2,
-            }),
-            infuraProvider({ priority: 3, stallTimeout: 1000, weight: 3 }),
-            publicProvider({ priority: 4, stallTimeout: 1000, weight: 4 }),
-        ]
-    )
+    const { chains, provider, webSocketProvider } = configureChains(configuredChains, [
+        jsonRpcProvider({
+            rpc: (chain) => {
+                if (!Object.keys(runtimeConfig.public.supportedChainsMetadata).includes(chain.id.toString())) {
+                    return null
+                }
+                return {
+                    http: runtimeConfig.public.quicknode.https,
+                    webSocket: runtimeConfig.public.quicknode.websocket,
+                }
+            },
+            priority: 1,
+            stallTimeout: 1000,
+            weight: 1,
+        }),
+        alchemyProvider({
+            alchemyId: runtimeConfig.alchemy.apiKey,
+            priority: 2,
+            stallTimeout: 1000,
+            weight: 2,
+        }),
+        infuraProvider({ priority: 3, stallTimeout: 1000, weight: 3 }),
+        publicProvider({ priority: 4, stallTimeout: 1000, weight: 4 }),
+    ])
 
     const client = createClient({
         autoConnect: true,
