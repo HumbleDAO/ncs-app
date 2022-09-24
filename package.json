@@ -40,6 +40,7 @@
         "fundedwallet": "cd packages/hardhat && npx hardhat fundedwallet",
         "flatten": "cd packages/hardhat && npx hardhat flatten",
         "clean": "cd packages/hardhat && npx hardhat clean",
+        "preinstall": "yarn workspace @ncs/nuxt-app preinstall",
         "postinstall": "husky install",
         "prepare": "husky install"
     },

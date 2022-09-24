@@ -10,7 +10,8 @@
         "preview": "nuxt preview",
         "lint": "eslint --ext .js,.ts --ignore-path .eslintignore .",
         "prettier": "prettier --write \"**/*.{js,ts,vue}\"",
-        "clean": "npx nuxi-edge@latest cleanup"
+        "clean": "npx nuxi-edge@latest cleanup",
+        "preinstall": "node ./scripts/create-contracts.js"
     },
     "devDependencies": {
         "@nuxtjs/eslint-config-typescript": "^10.0.0",
@@ -40,7 +41,7 @@
         "@vitejs/plugin-vue": "^3.0.3",
         "@walletconnect/web3-provider": "^1.8.0",
         "authereum": "^0.1.14",
-        "daisyui": "^2.24.0",
+        "daisyui": "^2.31.0",
         "ethers": "^5.7.0",
         "fortmatic": "^2.4.0",
         "lodash": "^4.17.21",
