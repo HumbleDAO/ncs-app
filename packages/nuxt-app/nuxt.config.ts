@@ -115,6 +115,10 @@ export default defineNuxtConfig({
             eslintPlugin(),
         ],
     },
+
+    nitro: {
+        preset: 'netlify',
+    },
 })
 
 // interface ISupportedChain {
